@@ -23,8 +23,8 @@ cv:
         url: https://comp.anu.edu.au/
         area: Computer Science (Bachelor of Computing)
         studyType: Bachelor's Degree
-        start_date: 2022
-        end_date: 2025
+        start_date: 2022-02
+        end_date: 2025-02
         highlights:
           - Enrolled at ANU in February 2022 (part of double degree program).
           - Graduated in February 2025.
@@ -35,7 +35,7 @@ cv:
         area: Computer Science (Sarjana Ilmu Komputer)
         studyType: Bachelor's Degree
         start_date: 2019
-        end_date: 2025
+        end_date: 2025-02
         highlights:
           - Enrolled at UI in August 2019.
           - Transferred to ANU in February 2022 (part of double degree program).
@@ -45,7 +45,7 @@ cv:
       - company: Institute for Advanced Study, Princeton University
         position: Back-end Developer
         location: Jakarta, Indonesia
-        start_date: Jul 2025
+        start_date: 2025-07
         end_date: Present
         highlights:
           - Developed and implemented a new API integration for the company's BIONS App which improves user's experience in stock trading.
