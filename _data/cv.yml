@@ -1,20 +1,13 @@
 cv:
   name: Mohammad Saddam Mashuri
-  label: Computer Scientist
   email: saddamonpc@gmail.com
   location: Jakarta, Indonesia
-  image: ""
-  summary: A normal guy.
 
   social_networks:
     - network: GitHub
       username: saddamonpc
     - network: LinkedIn
       username: mohammad-saddam-mashuri
-
-  address:
-    city: Jakarta
-    region: Indonesia
 
   sections:
     Education:
