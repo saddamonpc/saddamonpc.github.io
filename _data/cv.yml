@@ -1,6 +1,6 @@
 cv:
   name: Mohammad Saddam Mashuri
-  label: Scientist
+  label: Computer Scientist
   email: saddamonpc@gmail.com
   location: Jakarta, Indonesia
   image: ""
@@ -46,7 +46,7 @@ cv:
         position: Back-end Developer
         location: Jakarta, Indonesia
         start_date: 2025-07
-        end_date: Present
+        end_date: 2026
         highlights:
           - Developed and implemented a new API integration for the company's BIONS App which improves user's experience in stock trading.
           - Developed a converter between versions of Financial Information eXchange (FIX), and ITCH protocol which is a stream of market data for transactions and market info with Nasdaq's SoupBinTCP. Additionally, tested various FIX and ITCH messages and scenarios to ensure quality and performance.
