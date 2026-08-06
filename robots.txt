@@ -1,4 +1,4 @@
 User-agent: *
 Disallow:
 
-Sitemap: https://msmashuri.com/sitemap.xml
+Sitemap: https://saddamonpc.github.io/sitemap.xml
