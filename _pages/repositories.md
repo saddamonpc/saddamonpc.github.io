@@ -1,11 +1,11 @@
----
+<!--- ---
 layout: page
 permalink: /repositories/
 title: repositories
 description: Repositories I've participated in or contributed to
 nav: true
 nav_order: 4
----
+--- --->
 
 {% if site.data.repositories.github_users %}
 

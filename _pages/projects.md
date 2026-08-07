@@ -8,6 +8,13 @@ nav_order: 3
 display_categories: [work, fun]
 horizontal: false
 ---
+<div class="d-flex justify-content-center flex-wrap gap-2">
+  {% for category in page.display_categories %}
+    <a href="#{{ category | downcase }}" class="btn btn-outline-secondary rounded-pill">
+      {{ category | capitalize }}
+    </a>
+  {% endfor %}
+</div>
 
 <!-- pages/projects.md -->
 <div class="projects">
