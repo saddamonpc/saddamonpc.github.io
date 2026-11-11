@@ -1,0 +1,43 @@
+---
+// A PDF download button. Without a file yet, it's greyed out and says "under construction"
+// on hover and on keyboard focus (so keyboard users see it too), and does nothing when pressed.
+interface Props {
+	label: string;
+	href: string | null;
+}
+
+const { label, href } = Astro.props;
+const base = 'relative inline-block rounded border px-2.5 py-1 text-center font-mono text-xs whitespace-nowrap no-underline';
+---
+
+{
+	href ? (
+		<a href={href} download class:list={[base, 'border-accent text-accent hover:bg-accent hover:text-bg']}>
+			⤓ {label}
+		</a>
+	) : (
+		<a role="link" aria-disabled="true" tabindex="0" class:list={[base, 'disabled cursor-not-allowed border-line text-muted']}>
+			⤓ {label}
+			<span class="tip">under construction</span>
+		</a>
+	)
+}
+
+<style>
+	.tip {
+		display: none;
+		position: absolute;
+		top: calc(100% + 4px);
+		right: 0;
+		padding: 0.15rem 0.5rem;
+		background: var(--color-code);
+		border: 1px solid var(--color-line);
+		border-radius: 4px;
+		color: var(--color-fg);
+		z-index: 5;
+	}
+	.disabled:hover .tip,
+	.disabled:focus-visible .tip {
+		display: block;
+	}
+</style>

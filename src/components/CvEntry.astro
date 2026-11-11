@@ -1,0 +1,47 @@
+---
+// One job or study entry: "Role · Organisation" with dates on the right, location, then details.
+// The dot on the timeline is filled while the entry is ongoing (end: 'present').
+import type { CvEntry } from '../data/cv';
+
+interface Props {
+	entry: CvEntry;
+}
+
+const { entry } = Astro.props;
+---
+
+<div data-cv-entry class:list={['entry relative mb-4', { ongoing: entry.end === 'present' }]}>
+	<div class="flex flex-wrap items-baseline justify-between gap-x-3">
+		<span data-cv-title><b class="font-semibold text-strong">{entry.title}</b> · {entry.org}</span>
+		<span data-cv-when class="font-mono text-xs whitespace-nowrap text-muted">{entry.start} – {entry.end}</span>
+	</div>
+	{entry.location && <div class="font-mono text-xs text-muted">{entry.location}</div>}
+	{entry.note && <p class="mt-1 text-[0.95em]">{entry.note}</p>}
+	{
+		entry.bullets && (
+			<ul class="mt-1 list-disc pl-5">
+				{entry.bullets.map((bullet) => (
+					<li>{bullet}</li>
+				))}
+			</ul>
+		)
+	}
+</div>
+
+<style>
+	/* The timeline dot, sitting on the rail drawn by the section (see cv.astro). */
+	.entry::before {
+		content: '';
+		position: absolute;
+		left: -1.5rem;
+		top: 0.45rem;
+		width: 11px;
+		height: 11px;
+		border-radius: 50%;
+		border: 2px solid var(--color-accent);
+		background: var(--color-bg);
+	}
+	.entry.ongoing::before {
+		background: var(--color-accent);
+	}
+</style>
