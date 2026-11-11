@@ -22,12 +22,15 @@ test('entry dates sit on the right of the title line', async ({ page }) => {
 	expect(Math.abs(w.x + w.width - (e.x + e.width))).toBeLessThanOrEqual(4);
 });
 
-test('timeline dot is filled only for ongoing entries', async ({ page }) => {
+test('timeline dots: gradient-filled when ongoing, gradient ring otherwise', async ({ page }) => {
 	await page.goto('/cv/');
-	const dot = (i: number) =>
-		page.locator('[data-cv-entry]').nth(i).evaluate((el) => getComputedStyle(el, '::before').backgroundColor);
-	expect(await dot(0)).toBe('rgb(151, 218, 126)');
-	expect(await dot(2)).not.toBe('rgb(151, 218, 126)'); // Universitas Indonesia, ended 2025
+	const dot = (i: number) => page.locator('[data-cv-entry]').nth(i).evaluate((el) => getComputedStyle(el, '::before').backgroundImage);
+	const ongoing = await dot(0);
+	expect(ongoing).toContain('linear-gradient(90deg, rgb(151, 218, 126)');
+	expect(ongoing).not.toContain('rgb(23, 26, 25)'); // no page-coloured centre: filled
+	const ended = await dot(2); // Universitas Indonesia, ended 2025
+	expect(ended).toContain('linear-gradient(90deg, rgb(151, 218, 126)'); // the ring
+	expect(ended).toContain('rgb(23, 26, 25)'); // page-coloured centre: hollow
 });
 
 test('download buttons are greyed out until the PDFs exist', async ({ page }) => {

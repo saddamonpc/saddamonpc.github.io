@@ -81,3 +81,24 @@ test('the meta description is the post preview', async ({ page }) => {
 	await page.goto(URL);
 	await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /^This is a sample post\./);
 });
+
+test.describe('phone', () => {
+	test.use({ viewport: { width: 360, height: 760 } });
+
+	test('the code language label sits above the code, not over it', async ({ page }) => {
+		await page.goto(URL);
+		const room = await page.locator('.prose pre[data-language]').first().evaluate((pre) => {
+			const label = getComputedStyle(pre, '::after');
+			return Number.parseFloat(getComputedStyle(pre).paddingTop) - (Number.parseFloat(label.top) + Number.parseFloat(label.height));
+		});
+		expect(room).toBeGreaterThanOrEqual(0);
+	});
+});
+
+test('blockquotes and inline code get the gradient', async ({ page }) => {
+	await page.goto(URL);
+	const style = (selector: string) => page.locator(selector).first().evaluate((el) => getComputedStyle(el));
+	expect((await style('.prose blockquote:not(.callout)')).backgroundImage).toContain('linear-gradient');
+	expect((await style('.prose blockquote:not(.callout)')).borderImageSource).toContain('linear-gradient');
+	expect((await style('.prose :not(pre) > code')).backgroundImage).toContain('linear-gradient');
+});

@@ -49,7 +49,11 @@
 	font-family: var(--font-mono);
 	font-weight: 400;
 	font-size: 0.85em;
-	background: var(--color-code);
+	background: linear-gradient(
+		90deg,
+		color-mix(in srgb, var(--color-accent) 14%, var(--color-code)),
+		color-mix(in srgb, var(--color-mint) 14%, var(--color-code))
+	);
 	border: 1px solid var(--color-line);
 	border-radius: 4px;
 	padding: 0.1em 0.35em;
@@ -66,6 +70,10 @@
 	background-color: var(--color-code) !important;
 	font-family: var(--font-mono);
 }
+/* Room at the top for the language label, so it never sits on the code (narrow screens). */
+.prose pre[data-language] {
+	padding-top: 2rem;
+}
 .prose pre[data-language]::after {
 	content: attr(data-language);
 	position: absolute;
@@ -75,9 +83,16 @@
 	color: var(--color-muted);
 }
 
-/* Quotes: accent bar, no extra quotation marks. */
-.prose blockquote {
+/* Quotes: a pistachio-to-mint bar (top to bottom) and a faint gradient behind, no extra quotation marks. */
+.prose blockquote:not(.callout) {
 	font-weight: 400;
+	border-left: 3px solid;
+	border-image: linear-gradient(to bottom, var(--color-accent), var(--color-mint)) 1;
+	background: linear-gradient(90deg, color-mix(in srgb, var(--color-accent) 10%, transparent), transparent 85%);
+	padding: 0.4rem 1rem;
+}
+.prose blockquote:not(.callout) > p {
+	margin: 0.35em 0;
 }
 .prose blockquote p::before,
 .prose blockquote p::after {

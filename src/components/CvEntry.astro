@@ -38,10 +38,14 @@ const { entry } = Astro.props;
 		width: 11px;
 		height: 11px;
 		border-radius: 50%;
-		border: 2px solid var(--color-accent);
-		background: var(--color-bg);
+		/* A gradient ring: page colour inside, pistachio-to-mint showing through the transparent border. */
+		border: 2px solid transparent;
+		background:
+			linear-gradient(var(--color-bg), var(--color-bg)) padding-box,
+			linear-gradient(90deg, var(--color-accent), var(--color-mint)) border-box;
 	}
+	/* Ongoing: filled with the gradient. */
 	.entry.ongoing::before {
-		background: var(--color-accent);
+		background: linear-gradient(90deg, var(--color-accent), var(--color-mint)) border-box;
 	}
 </style>
