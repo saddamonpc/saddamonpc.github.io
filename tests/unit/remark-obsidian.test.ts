@@ -76,10 +76,6 @@ describe('embeds', () => {
 });
 
 describe('inline extras', () => {
-	test('==text== is highlighted', () => {
-		expect(render('a ==b== c')).toContain('<mark>b</mark>');
-	});
-
 	test('%%comments%% are removed, and a comment-only paragraph disappears', () => {
 		const html = render('x %%secret%% y\n\n%%only a comment%%\n\nafter');
 		expect(html).not.toContain('secret');

@@ -1,9 +1,14 @@
 // @ts-check
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
+import rehypeFigure from '@microflash/rehype-figure';
 import { defineConfig, fontProviders } from 'astro/config';
+import rehypeCallouts from 'rehype-callouts';
+import remarkFlexibleMarkers from 'remark-flexible-markers';
+import remarkReadingTime from 'remark-reading-time';
 import { buildLinkIndex } from './src/lib/markdown/link-index.ts';
 import { remarkObsidian } from './src/lib/markdown/remark-obsidian.ts';
+import { remarkPostMeta } from './src/lib/markdown/remark-post-meta.ts';
 
 // https://astro.build/config
 export default defineConfig({
@@ -16,7 +21,16 @@ export default defineConfig({
 
 	// How Markdown is turned into pages. Plugins run in order, top to bottom.
 	markdown: {
-		remarkPlugins: [[remarkObsidian, { resolveLink: buildLinkIndex('./src/content') }]],
+		remarkPlugins: [
+			[remarkObsidian, { resolveLink: buildLinkIndex('./src/content') }], // [[links]], ![[embeds]], %%comments%%, YouTube
+			remarkFlexibleMarkers, // ==highlight==
+			remarkReadingTime, // "N min read"
+			remarkPostMeta, // preview text and picture list for the posts page
+		],
+		rehypePlugins: [
+			[rehypeCallouts, { theme: 'obsidian', showIndicator: false }], // > [!tip] callouts
+			rehypeFigure, // a picture on its own line gets a caption
+		],
 	},
 
 	// Fonts are downloaded at build time and served from this site (no requests to Google at runtime).

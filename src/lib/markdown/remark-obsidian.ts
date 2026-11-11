@@ -3,8 +3,12 @@
 //   ![[photo.jpg|text]]   picture (text becomes its description/caption)
 //   ![[take.mp3|title]]   audio player box
 //   [[note|text]]         link to another post or project (or plain text if it doesn't exist)
-//   ==text==              highlight
 //   ![](youtube link)     YouTube video (privacy-friendly embed)
+// (==highlights== come from the remark-flexible-markers package and callouts from rehype-callouts.)
+//
+// Hand-written because no existing package fits (checked 2026-11-11): @flowershow/remark-wiki-link
+// turns pictures into raw HTML, so Astro can't optimise them, and remark-obsidian has no picture or
+// audio embeds and can't point links at /posts/<folder>/.
 import { slug } from 'github-slugger';
 import type { Html, Image, Link, PhrasingContent, Root, Text } from 'mdast';
 import { SKIP, visit } from 'unist-util-visit';
@@ -18,7 +22,7 @@ export interface ObsidianOptions {
 const IMAGE = /\.(png|jpe?g|webp|avif|gif|svg)$/i;
 const AUDIO = /\.(mp3|m4a|wav|ogg)$/i;
 const OBSIDIAN_SIZE = /^\d+(x\d+)?$/; // ![[photo.jpg|300]] sets a size in Obsidian; ignored here
-const TOKENS = /(!?)\[\[([^\]\n]+?)\]\]|==([^=\n]+?)==/g;
+const WIKI = /(!?)\[\[([^\]\n]+?)\]\]/g;
 
 export function remarkObsidian({ resolveLink }: ObsidianOptions) {
 	return (tree: Root, file: VFile) => {
@@ -67,14 +71,10 @@ function removeComments(tree: Root) {
 function splitText(value: string, resolveLink: ObsidianOptions['resolveLink'], file: VFile): PhrasingContent[] | null {
 	const parts: PhrasingContent[] = [];
 	let last = 0;
-	for (const match of value.matchAll(TOKENS)) {
-		const [whole, bang, target, highlighted] = match;
+	for (const match of value.matchAll(WIKI)) {
+		const [whole, bang, target] = match;
 		if (match.index > last) parts.push(text(value.slice(last, match.index)));
-		if (highlighted !== undefined) {
-			parts.push({ type: 'highlight', data: { hName: 'mark' }, children: [text(highlighted)] } as unknown as PhrasingContent);
-		} else {
-			parts.push(bang ? embed(target, resolveLink, file) : wikilink(target, resolveLink, file));
-		}
+		parts.push(bang ? embed(target, resolveLink, file) : wikilink(target, resolveLink, file));
 		last = match.index + whole.length;
 	}
 	if (last === 0) return null;

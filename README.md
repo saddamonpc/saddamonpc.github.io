@@ -56,7 +56,7 @@ Projects work the same way in `src/content/projects/`, and can also have `catego
 - Normal Markdown: headings, **bold**, _italic_, links, lists, tables, `code`, footnotes.
 - Obsidian extras: `==highlight==`, `%%hidden comments%%`, callouts (`> [!tip]`, `> [!note]`, `> [!warning]` and Obsidian's other types, plus foldable `> [!note]-`).
 - Links to other notes: `[[sample-project]]`, `[[sample-project|your own text]]`, `[[sample-project#A heading]]`.
-- Pictures: `![[photo.jpg]]`, `![[photo.jpg|caption]]`, or `![description](./photo.jpg "caption")`. Give pictures a caption or description where you can: it's read aloud to people who can't see them.
+- Pictures: `![[photo.jpg]]`, `![[photo.jpg|caption]]`, or `![caption](./photo.jpg)`. The caption shows under the picture and is read aloud to people who can't see it, so add one where you can.
 - Audio: `![[take.mp3|Title · recorded 2026-10-18]]`, with the file in the same folder (mp3, m4a, wav, ogg).
 - YouTube: `![](https://www.youtube.com/watch?v=...)`.
 
