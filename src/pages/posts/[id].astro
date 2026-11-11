@@ -1,6 +1,7 @@
 ---
-// Temporary: replaced by the real post page in Task 7.
+// One page per post: /posts/<folder>/
 import { render } from 'astro:content';
+import EntryLayout from '../../layouts/EntryLayout.astro';
 import { getPublished } from '../../lib/collections';
 
 export async function getStaticPaths() {
@@ -9,7 +10,18 @@ export async function getStaticPaths() {
 }
 
 const { post } = Astro.props;
-const { Content } = await render(post);
+const { Content, headings, remarkPluginFrontmatter } = await render(post);
 ---
 
-<main><Content /></main>
+<EntryLayout
+	collection="posts"
+	title={post.data.title}
+	date={post.data.date}
+	tags={post.data.tags}
+	cover={post.data.cover}
+	headings={headings}
+	readingMinutes={remarkPluginFrontmatter.readingMinutes}
+	description={remarkPluginFrontmatter.excerpt}
+>
+	<Content />
+</EntryLayout>

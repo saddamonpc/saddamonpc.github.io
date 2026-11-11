@@ -22,6 +22,8 @@ export default defineConfig({
 
 	// How Markdown is turned into pages. Plugins run in order, top to bottom.
 	markdown: {
+		// Code colours. Everforest is a green-tinted dark theme that sits well with the site's palette.
+		shikiConfig: { theme: 'everforest-dark' },
 		remarkPlugins: [
 			[remarkObsidian, { resolveLink: buildLinkIndex('./src/content') }], // [[links]], ![[embeds]], %%comments%%, YouTube
 			remarkFlexibleMarkers, // ==highlight==

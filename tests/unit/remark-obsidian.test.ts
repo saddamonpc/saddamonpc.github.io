@@ -75,6 +75,19 @@ describe('embeds', () => {
 	});
 });
 
+describe('callouts', () => {
+	test('an unknown callout type becomes a note titled with that type, like in Obsidian', () => {
+		expect(render('> [!banana]\n> text')).toContain('[!note] Banana');
+		expect(render('> [!banana] My title\n> text')).toContain('[!note] My title');
+		expect(render('> [!banana]- Folded\n> text')).toContain('[!note]- Folded');
+	});
+
+	test('known types are left alone', () => {
+		expect(render('> [!Warning]\n> text')).toContain('[!Warning]');
+		expect(render('> [!faq]\n> text')).toContain('[!faq]');
+	});
+});
+
 describe('inline extras', () => {
 	test('%%comments%% are removed, and a comment-only paragraph disappears', () => {
 		const html = render('x %%secret%% y\n\n%%only a comment%%\n\nafter');

@@ -1,0 +1,60 @@
+---
+// The page for one post or project: fading header image, title, meta line, table of contents, text.
+import type { ImageMetadata, MarkdownHeading } from 'astro';
+import { Image } from 'astro:assets';
+import TableOfContents from '../components/TableOfContents.astro';
+import TagPills from '../components/TagPills.astro';
+import type { CollectionName } from '../lib/content';
+import { formatDate } from '../lib/dates';
+import '../styles/prose.css';
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+	collection: CollectionName;
+	title: string;
+	date: Date;
+	tags: string[];
+	cover?: ImageMetadata;
+	headings: MarkdownHeading[];
+	readingMinutes: number;
+	description: string;
+	facts?: { category?: string; tools?: string[]; timeframe?: string };
+}
+
+const { collection, title, date, tags, cover, headings, readingMinutes, description } = Astro.props;
+---
+
+<BaseLayout title={title} description={description} image={cover} current={collection}>
+	<article>
+		{
+			cover && (
+				<div class="hero" data-hero>
+					<Image src={cover} alt="" width={1600} class="h-60 w-full object-cover sm:h-72" loading="eager" />
+				</div>
+			)
+		}
+		<div class="mx-auto max-w-5xl px-4 sm:px-8 lg:grid lg:grid-cols-[minmax(0,1fr)_13rem] lg:gap-x-12">
+			<header class:list={['lg:col-start-1', cover ? 'relative -mt-12' : 'pt-10']}>
+				<h1 class="mb-2 text-3xl leading-tight font-semibold text-strong sm:text-4xl">{title}</h1>
+				<div data-entry-meta class="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs text-muted">
+					<span>{formatDate(date, 'iso')} · {readingMinutes} min read</span>
+					<TagPills tags={tags} collection={collection} />
+				</div>
+				<slot name="facts" />
+			</header>
+			<aside class="mt-6 lg:sticky lg:top-6 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:mt-10 lg:self-start">
+				<TableOfContents headings={headings} />
+			</aside>
+			<div class="prose mt-8 max-w-none lg:col-start-1">
+				<slot />
+			</div>
+		</div>
+	</article>
+</BaseLayout>
+
+<style>
+	/* The header picture fades out into the page at the bottom. */
+	.hero {
+		mask-image: linear-gradient(to bottom, #000 40%, transparent 100%);
+	}
+</style>

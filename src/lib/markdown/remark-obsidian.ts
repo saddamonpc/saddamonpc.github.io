@@ -27,6 +27,7 @@ const WIKI = /(!?)\[\[([^\]\n]+?)\]\]/g;
 export function remarkObsidian({ resolveLink }: ObsidianOptions) {
 	return (tree: Root, file: VFile) => {
 		removeComments(tree);
+		unknownCalloutsToNotes(tree);
 
 		visit(tree, 'text', (node, index, parent) => {
 			if (!parent || index === undefined) return;
@@ -52,6 +53,25 @@ export function remarkObsidian({ resolveLink }: ObsidianOptions) {
 			}
 		});
 	};
+}
+
+// Obsidian's callout types (rehype-callouts styles these). Anything else shows as a note in Obsidian,
+// but rehype-callouts would leave it as a plain quote, so rewrite it: [!banana] → [!note] Banana
+const CALLOUT_TYPES = new Set(
+	'note abstract summary tldr info todo tip hint important success check done question help faq warning caution attention failure fail missing danger error bug example quote cite'.split(' '),
+);
+
+function unknownCalloutsToNotes(tree: Root) {
+	visit(tree, 'blockquote', (node) => {
+		const first = node.children[0];
+		const lead = first?.type === 'paragraph' ? first.children[0] : undefined;
+		if (lead?.type !== 'text') return;
+		lead.value = lead.value.replace(/^\[!([\w-]+)\]([+-]?)([^\n]*)/, (whole, type: string, fold: string, title: string) => {
+			if (CALLOUT_TYPES.has(type.toLowerCase())) return whole;
+			const shown = title.trim() || type.charAt(0).toUpperCase() + type.slice(1);
+			return `[!note]${fold} ${shown}`;
+		});
+	});
 }
 
 function removeComments(tree: Root) {

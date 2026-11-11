@@ -1,0 +1,77 @@
+---
+// "On this page" list of a post's headings.
+// Wide screens: a sticky sidebar that highlights the section being read.
+// Phones (and without JavaScript): a folded "contents" box under the title.
+import type { MarkdownHeading } from 'astro';
+
+interface Props {
+	headings: MarkdownHeading[];
+}
+
+const items = Astro.props.headings.filter((h) => (h.depth === 2 || h.depth === 3) && h.slug !== 'footnote-label');
+---
+
+{
+	items.length >= 2 && (
+		<details class="toc rounded border border-line px-3 py-2 lg:border-0 lg:p-0" data-toc>
+			<summary class="cursor-pointer font-mono text-sm text-muted">contents</summary>
+			<p class="toc-label mb-2 font-mono text-sm text-muted">on this page</p>
+			<nav aria-label="Table of contents">
+				<ol class="mt-2 font-mono text-sm leading-snug lg:mt-0">
+					{items.map((h) => (
+						<li class={h.depth === 3 ? 'pl-3' : ''}>
+							<a
+								href={`#${h.slug}`}
+								class="block border-l-2 border-line py-1 pl-2.5 text-muted no-underline hover:text-fg aria-[current=true]:border-accent aria-[current=true]:text-accent"
+							>
+								{h.text}
+							</a>
+						</li>
+					))}
+				</ol>
+			</nav>
+		</details>
+	)
+}
+
+<style>
+	.toc-label {
+		display: none;
+	}
+	.toc[data-wide] summary {
+		display: none;
+	}
+	.toc[data-wide] .toc-label {
+		display: block;
+	}
+</style>
+
+<script>
+	const toc = document.querySelector<HTMLDetailsElement>('[data-toc]');
+	if (toc) {
+		// Open as a sidebar on wide screens, folded on phones.
+		const wide = matchMedia('(min-width: 1024px)');
+		const sync = () => {
+			toc.open = wide.matches;
+			toc.toggleAttribute('data-wide', wide.matches);
+		};
+		sync();
+		wide.addEventListener('change', sync);
+
+		// Highlight the link of the section currently at the top of the screen.
+		const links = [...toc.querySelectorAll('a')];
+		const observer = new IntersectionObserver(
+			(entries) => {
+				for (const entry of entries) {
+					if (!entry.isIntersecting) continue;
+					for (const link of links) link.setAttribute('aria-current', String(link.hash === `#${entry.target.id}`));
+				}
+			},
+			{ rootMargin: '0px 0px -70% 0px' },
+		);
+		for (const link of links) {
+			const heading = document.getElementById(decodeURIComponent(link.hash.slice(1)));
+			if (heading) observer.observe(heading);
+		}
+	}
+</script>

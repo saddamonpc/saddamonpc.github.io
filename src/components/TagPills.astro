@@ -1,0 +1,25 @@
+---
+// A row of #tag links. Each one opens the posts (or projects) page filtered to that tag.
+import { type CollectionName, tagUrl } from '../lib/content';
+
+interface Props {
+	tags: string[];
+	collection: CollectionName;
+}
+
+const { tags, collection } = Astro.props;
+---
+
+{
+	tags.length > 0 && (
+		<ul class="inline-flex flex-wrap gap-1">
+			{tags.map((tag) => (
+				<li>
+					<a href={tagUrl(collection, tag)} class="rounded-full bg-accent/12 px-2 py-px font-mono text-xs text-accent no-underline hover:bg-accent/25">
+						#{tag}
+					</a>
+				</li>
+			))}
+		</ul>
+	)
+}
