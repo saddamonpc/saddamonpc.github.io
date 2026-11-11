@@ -1,0 +1,26 @@
+# build output and generated types
+dist/
+.astro/
+
+# dependencies
+node_modules/
+
+# test output
+test-results/
+playwright-report/
+
+# logs and environment
+npm-debug.log*
+.env
+.env.production
+
+# OS and editor files
+.DS_Store
+.idea/
+
+# Obsidian: keep the vault settings, ignore per-device layout files
+src/content/.obsidian/workspace*.json
+
+# Private design notes and build scratch. Never commit these: the repo is public.
+docs/superpowers/
+.superpowers/
