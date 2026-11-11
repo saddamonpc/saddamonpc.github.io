@@ -31,4 +31,37 @@ Pushing to `main` on GitHub runs the tests and deploys the site automatically.
 
 ## Writing a post
 
-(Filled in as the content model lands.)
+Open `src/content/` as a vault in Obsidian. Its settings (in `src/content/.obsidian/`) already put pasted pictures next to the note you're writing.
+
+1. Make a folder in `src/content/posts/` named like the page address you want, e.g. `barre-chords`. Use lowercase and dashes.
+2. Inside it, make a note with the **same name**: `barre-chords/barre-chords.md`. (Same name, so Obsidian's `[[barre-chords]]` links can find it.)
+3. Start the note with this frontmatter:
+
+   ```yaml
+   ---
+   title: Learning barre chords, again
+   date: 2026-10-18
+   tags: [guitar, practice]
+   cover: ./cover.jpg # optional header image, in the same folder
+   draft: true # optional: shows in `npm run dev`, hidden on the real site
+   ---
+   ```
+
+4. Write. The page appears at `/posts/barre-chords/`.
+
+Projects work the same way in `src/content/projects/`, and can also have `category`, `tools: [ZBrush, Blender]` and `timeframe: Sep – Oct 2026`, which show in a strip under the title.
+
+### What works
+
+- Normal Markdown: headings, **bold**, _italic_, links, lists, tables, `code`, footnotes.
+- Obsidian extras: `==highlight==`, `%%hidden comments%%`, callouts (`> [!tip]`, `> [!note]`, `> [!warning]` and Obsidian's other types, plus foldable `> [!note]-`).
+- Links to other notes: `[[sample-project]]`, `[[sample-project|your own text]]`, `[[sample-project#A heading]]`.
+- Pictures: `![[photo.jpg]]`, `![[photo.jpg|caption]]`, or `![description](./photo.jpg "caption")`. Give pictures a caption or description where you can: it's read aloud to people who can't see them.
+- Audio: `![[take.mp3|Title · recorded 2026-10-18]]`, with the file in the same folder (mp3, m4a, wav, ogg).
+- YouTube: `![](https://www.youtube.com/watch?v=...)`.
+
+### What doesn't (yet)
+
+Embedding a whole other note (`![[other note]]`), block references (`^id`), Dataview, and Canvas.
+
+The first real paragraph of a post becomes its preview on the posts page, so make it a good one.
