@@ -6,6 +6,7 @@ import { defineConfig, fontProviders } from 'astro/config';
 import rehypeCallouts from 'rehype-callouts';
 import remarkFlexibleMarkers from 'remark-flexible-markers';
 import remarkReadingTime from 'remark-reading-time';
+import { viteStaticCopy } from 'vite-plugin-static-copy';
 import { buildLinkIndex } from './src/lib/markdown/link-index.ts';
 import { remarkObsidian } from './src/lib/markdown/remark-obsidian.ts';
 import { remarkPostMeta } from './src/lib/markdown/remark-post-meta.ts';
@@ -56,6 +57,18 @@ export default defineConfig({
 	],
 
 	vite: {
-		plugins: [tailwindcss()],
+		plugins: [
+			tailwindcss(),
+			// Audio files sit next to their post (src/content/posts/<folder>/take.mp3).
+			// Copy them to the same address as the post (/posts/<folder>/take.mp3), and serve them in dev too.
+			viteStaticCopy({
+				silent: true, // fine if a folder has no audio yet
+				targets: ['posts', 'projects'].map((collection) => ({
+					src: `src/content/${collection}/*/*.{mp3,m4a,wav,ogg}`,
+					dest: collection,
+					rename: { stripBase: 3 },
+				})),
+			}),
+		],
 	},
 });
