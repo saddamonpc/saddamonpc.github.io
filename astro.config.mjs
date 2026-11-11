@@ -2,6 +2,8 @@
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig, fontProviders } from 'astro/config';
+import { buildLinkIndex } from './src/lib/markdown/link-index.ts';
+import { remarkObsidian } from './src/lib/markdown/remark-obsidian.ts';
 
 // https://astro.build/config
 export default defineConfig({
@@ -11,6 +13,11 @@ export default defineConfig({
 	trailingSlash: 'always',
 
 	integrations: [sitemap()],
+
+	// How Markdown is turned into pages. Plugins run in order, top to bottom.
+	markdown: {
+		remarkPlugins: [[remarkObsidian, { resolveLink: buildLinkIndex('./src/content') }]],
+	},
 
 	// Fonts are downloaded at build time and served from this site (no requests to Google at runtime).
 	fonts: [
