@@ -1,0 +1,96 @@
+---
+// Filter bar for the posts and projects pages.
+// Filters every element on the page that has data-tags='["tag", ...]'.
+// Groups marked data-filter-group (e.g. a year) hide when nothing inside them is left.
+// Without JavaScript the bar stays hidden and everything is listed.
+interface Props {
+	tags: { tag: string; count: number }[];
+}
+
+const { tags } = Astro.props;
+---
+
+<div data-tag-filter hidden class="my-5 font-mono text-xs">
+	<div role="group" aria-label="Filter by tag" class="flex flex-wrap gap-1.5">
+		{
+			tags.map(({ tag, count }) => (
+				<button type="button" data-tag={tag} aria-pressed="false" class="filter-button">
+					{tag}
+					<span class="opacity-65">{count}</span>
+				</button>
+			))
+		}
+	</div>
+	<div class="mt-2.5 flex min-h-7 flex-wrap items-center gap-x-3.5 gap-y-2 text-muted">
+		<button type="button" data-multi aria-pressed="false" class="filter-button border-dashed aria-pressed:before:content-['✓_']">
+			select multiple
+		</button>
+		<span data-mode hidden role="group" aria-label="Match mode" class="inline-flex items-center overflow-hidden rounded-full border border-line">
+			<span class="px-2.5">match</span>
+			<button type="button" data-mode-value="any" aria-pressed="true" class="filter-mode">any</button>
+			<button type="button" data-mode-value="all" aria-pressed="false" class="filter-mode">all</button>
+		</span>
+		<button type="button" data-clear hidden class="cursor-pointer text-muted underline">clear</button>
+		<span data-count aria-live="polite" class="ml-auto"></span>
+	</div>
+	<p data-empty hidden class="mt-4 text-sm text-muted">Nothing matches every selected tag. Try "any", or fewer tags.</p>
+</div>
+
+<style>
+	@reference '../styles/global.css';
+	.filter-button {
+		@apply cursor-pointer rounded-full border border-line px-2.5 py-0.5 text-fg hover:border-accent aria-pressed:border-accent aria-pressed:bg-accent aria-pressed:text-bg;
+	}
+	.filter-mode {
+		@apply cursor-pointer px-2.5 py-0.5 text-fg aria-pressed:bg-accent aria-pressed:text-bg;
+	}
+</style>
+
+<script>
+	import { clearTags, matches, setMode, setMulti, stateFromQuery, stateToQuery, toggleTag } from '../lib/tag-filter';
+
+	const bar = document.querySelector<HTMLElement>('[data-tag-filter]');
+	if (bar) {
+		const items = [...document.querySelectorAll<HTMLElement>('[data-tags]')];
+		const groups = [...document.querySelectorAll<HTMLElement>('[data-filter-group]')];
+		const tagButtons = [...bar.querySelectorAll<HTMLButtonElement>('[data-tag]')];
+		const multiButton = bar.querySelector<HTMLButtonElement>('[data-multi]')!;
+		const modeGroup = bar.querySelector<HTMLElement>('[data-mode]')!;
+		const modeButtons = [...bar.querySelectorAll<HTMLButtonElement>('[data-mode-value]')];
+		const clearButton = bar.querySelector<HTMLButtonElement>('[data-clear]')!;
+		const count = bar.querySelector<HTMLElement>('[data-count]')!;
+		const empty = bar.querySelector<HTMLElement>('[data-empty]')!;
+		let state = stateFromQuery(location.search);
+
+		function render() {
+			let shown = 0;
+			for (const item of items) {
+				const visible = matches(JSON.parse(item.dataset.tags ?? '[]'), state);
+				item.hidden = !visible;
+				if (visible) shown++;
+			}
+			for (const group of groups) group.hidden = !group.querySelector('[data-tags]:not([hidden])');
+			for (const button of tagButtons) button.setAttribute('aria-pressed', String(state.selected.includes(button.dataset.tag!)));
+			for (const button of modeButtons) button.setAttribute('aria-pressed', String(state.mode === button.dataset.modeValue));
+			multiButton.setAttribute('aria-pressed', String(state.multi));
+			modeGroup.hidden = !state.multi;
+			clearButton.hidden = state.selected.length === 0;
+			empty.hidden = shown > 0;
+			count.textContent = `showing ${shown} of ${items.length}`;
+			history.replaceState(null, '', location.pathname + stateToQuery(state));
+		}
+
+		bar.addEventListener('click', (event) => {
+			const button = (event.target as HTMLElement).closest('button');
+			if (!button) return;
+			if (button.dataset.tag) state = toggleTag(state, button.dataset.tag);
+			else if (button.dataset.modeValue) state = setMode(state, button.dataset.modeValue as 'any' | 'all');
+			else if (button === multiButton) state = setMulti(state, !state.multi);
+			else if (button === clearButton) state = clearTags(state);
+			render();
+		});
+
+		bar.hidden = false;
+		render();
+	}
+</script>
