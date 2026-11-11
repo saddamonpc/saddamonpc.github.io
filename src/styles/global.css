@@ -14,6 +14,7 @@
 	--color-code: #1f2422;
 	/* Accent: Pistachio. Alternatives to switch to: mint #6fdcb0, jade leaf #84db95, moss lime #a6d96a */
 	--color-accent: #97da7e;
+	--color-mint: #6fdcb0; /* right-hand end of the highlight gradient */
 	--color-note: #a9acf2;
 	--color-warn: #e5b04a;
 }
@@ -67,6 +68,11 @@
 }
 .skip-link:focus {
 	top: 0.5rem;
+}
+
+/* Highlights (current page, pressed filter buttons, ...): pistachio fading to mint, left to right. Plain links don't use it. */
+@utility bg-highlight {
+	background-image: linear-gradient(90deg, var(--color-accent), var(--color-mint));
 }
 
 /* The page width shared by the navbar, every page and the footer. Change it here to change it everywhere. */

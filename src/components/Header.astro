@@ -26,7 +26,7 @@ const { current } = Astro.props;
 							<a
 								href={link.href}
 								aria-current={current === link.key ? 'page' : undefined}
-								class="block px-1 text-fg no-underline hover:bg-accent hover:text-bg aria-[current=page]:bg-accent aria-[current=page]:text-bg"
+								class="block px-1 text-fg no-underline hover:bg-highlight hover:text-bg aria-[current=page]:bg-highlight aria-[current=page]:text-bg"
 							>
 								{link.label}
 							</a>
@@ -41,6 +41,7 @@ const { current } = Astro.props;
 <style>
 	.menu-button {
 		display: none; /* phones only, see below */
+		touch-action: manipulation; /* no double-tap zoom on the button */
 		line-height: 0;
 		opacity: 0.85;
 	}
@@ -93,6 +94,11 @@ const { current } = Astro.props;
 			background: var(--color-bg);
 			animation: menu-fade-in 0.2s ease-in;
 		}
+		/* Closing: fade out, then the script hides it. Taps go through to the page meanwhile. */
+		:global(.js) #main-nav.open.closing {
+			animation: menu-fade-out 0.2s ease-out forwards;
+			pointer-events: none;
+		}
 		:global(.js) #main-nav.open ul {
 			flex-direction: column;
 			align-items: center;
@@ -108,8 +114,14 @@ const { current } = Astro.props;
 			opacity: 0;
 		}
 	}
+	@keyframes menu-fade-out {
+		to {
+			opacity: 0;
+		}
+	}
 	@media (prefers-reduced-motion: reduce) {
-		:global(.js) #main-nav.open {
+		:global(.js) #main-nav.open,
+		:global(.js) #main-nav.open.closing {
 			animation: none;
 		}
 	}
@@ -123,11 +135,25 @@ const { current } = Astro.props;
 	const button = document.querySelector<HTMLButtonElement>('.menu-button')!;
 	const nav = document.getElementById('main-nav')!;
 	const phone = matchMedia('(max-width: 639px)');
+	const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+	const FADE_MS = 200; // matches the 0.2s animations above
+	let fadeTimer: ReturnType<typeof setTimeout> | undefined;
 
 	function setOpen(open: boolean) {
-		nav.classList.toggle('open', open);
 		button.setAttribute('aria-expanded', String(open));
 		document.documentElement.classList.toggle('menu-open', open);
+		clearTimeout(fadeTimer); // a quick re-open cancels a fade-out in progress
+		if (open) {
+			nav.classList.remove('closing');
+			nav.classList.add('open');
+		} else if (nav.classList.contains('open')) {
+			if (reducedMotion.matches) {
+				nav.classList.remove('open', 'closing');
+				return;
+			}
+			nav.classList.add('closing');
+			fadeTimer = setTimeout(() => nav.classList.remove('open', 'closing'), FADE_MS);
+		}
 	}
 
 	button.addEventListener('click', () => setOpen(button.getAttribute('aria-expanded') !== 'true'));

@@ -54,6 +54,32 @@ test.describe('phone', () => {
 		expect(await page.evaluate(() => getComputedStyle(document.documentElement).overflow)).not.toBe('hidden');
 	});
 
+	test('closing fades out instead of cutting away', async ({ page }) => {
+		await page.goto('/');
+		const button = page.locator('button[aria-controls="main-nav"]');
+		const nav = page.locator('#main-nav');
+		await button.click();
+		await page.waitForTimeout(300);
+		await button.click();
+		// Right after closing, the menu is still on screen, fading.
+		expect(await nav.evaluate((el) => getComputedStyle(el).display)).not.toBe('none');
+		await expect(nav).toHaveClass(/closing/);
+		await expect(nav.locator('a').first()).toBeHidden();
+	});
+
+	test('reopening during the fade-out keeps the menu open', async ({ page }) => {
+		await page.goto('/');
+		const button = page.locator('button[aria-controls="main-nav"]');
+		await button.click();
+		await page.waitForTimeout(300);
+		await button.click(); // close: starts fading out
+		await button.click(); // open again straight away
+		await page.waitForTimeout(500);
+		await expect(button).toHaveAttribute('aria-expanded', 'true');
+		await expect(page.locator('#main-nav a').first()).toBeVisible();
+		expect(await page.locator('#main-nav').evaluate((el) => getComputedStyle(el).opacity)).toBe('1');
+	});
+
 	test('the top bar stays on screen while scrolling', async ({ page }) => {
 		await page.goto('/posts/sample-post/');
 		await page.mouse.wheel(0, 1500);
@@ -98,4 +124,16 @@ test('page content lines up with the navbar on every page', async ({ page }) => 
 		expect(Math.abs(pageLeft - headerLeft), `${path} left`).toBeLessThanOrEqual(1);
 		expect(Math.abs(pageRight - headerRight), `${path} right`).toBeLessThanOrEqual(1);
 	}
+});
+
+test('highlights use the pistachio-to-mint gradient; plain links do not', async ({ page }) => {
+	await page.goto('/posts/');
+	const gradient = (selector: string) => page.locator(selector).first().evaluate((el) => getComputedStyle(el).backgroundImage);
+	expect(await gradient('nav[aria-label="Main"] a[aria-current="page"]')).toMatch(/linear-gradient\(90deg, rgb\(151, 218, 126\).*rgb\(111, 220, 176\)/);
+	await page.getByRole('button', { name: /^practice\s*\d+$/ }).click();
+	expect(await gradient('[data-tag][aria-pressed="true"]')).toContain('linear-gradient');
+	await page.goto('/posts/sample-post/');
+	expect(await gradient('main mark')).toContain('linear-gradient');
+	await page.locator('.prose a.wikilink').first().hover();
+	expect(await gradient('.prose a.wikilink')).toBe('none');
 });

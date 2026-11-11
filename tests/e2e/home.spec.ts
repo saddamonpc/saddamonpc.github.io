@@ -33,3 +33,16 @@ test('recent posts', async ({ page }) => {
 	await expect(row.getByRole('link').first()).toHaveAttribute('href', '/posts/sample-post/');
 	await expect(row).toContainText('2026-11-02');
 });
+
+test.describe('phone', () => {
+	test.use({ viewport: { width: 375, height: 740 } });
+
+	test('recent posts always put the title under the date', async ({ page }) => {
+		await page.goto('/');
+		for (const row of await page.locator('[data-recent] > li').all()) {
+			const date = (await row.locator('time').boundingBox())!;
+			const title = (await row.getByRole('link').first().boundingBox())!;
+			expect(title.y).toBeGreaterThanOrEqual(date.y + date.height - 1);
+		}
+	});
+});

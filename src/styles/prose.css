@@ -34,7 +34,11 @@
 
 /* ==highlight== */
 .prose mark {
-	background: color-mix(in srgb, var(--color-accent) 28%, transparent);
+	background: linear-gradient(
+		90deg,
+		color-mix(in srgb, var(--color-accent) 30%, transparent),
+		color-mix(in srgb, var(--color-mint) 30%, transparent)
+	);
 	color: var(--color-strong);
 	padding: 0 0.2em;
 	border-radius: 3px;
