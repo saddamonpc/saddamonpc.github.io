@@ -15,7 +15,8 @@ export interface Cv {
 	name: string;
 	role: string;
 	updated: string; // YYYY-MM-DD
-	links: { label: string; href: string }[];
+	// icon: a name from the Material Design Icons set (https://icon-sets.iconify.design/mdi/)
+	links: { icon: string; text: string; href: string }[];
 	// Paths to the two PDFs, e.g. '/cv/mohammad-saddam-mashuri-cv.pdf' (put the files in public/cv/).
 	// null = the button is greyed out and says "under construction".
 	pdf: { cv: string | null; resume: string | null };
@@ -31,9 +32,9 @@ export const cv: Cv = {
 	role: 'Backend Developer · 3D hobbyist · guitarist',
 	updated: '2026-11-11',
 	links: [
-		{ label: 'email', href: 'mailto:saddamonpc@gmail.com' },
-		{ label: 'github', href: 'https://github.com/saddamonpc' },
-		{ label: 'linkedin', href: 'https://www.linkedin.com/in/mohammad-saddam-mashuri/' },
+		{ icon: 'mdi:email-outline', text: 'saddamonpc@gmail.com', href: 'mailto:saddamonpc@gmail.com' },
+		{ icon: 'mdi:github', text: 'github.com/saddamonpc', href: 'https://github.com/saddamonpc' },
+		{ icon: 'mdi:linkedin', text: 'linkedin.com/in/mohammad-saddam-mashuri', href: 'https://www.linkedin.com/in/mohammad-saddam-mashuri/' },
 	],
 	pdf: { cv: null, resume: null }, // TODO(Saddam): add the PDF paths when they're ready
 	about:

@@ -68,3 +68,14 @@
 .skip-link:focus {
 	top: 0.5rem;
 }
+
+/* The page width shared by the navbar, every page and the footer. Change it here to change it everywhere. */
+@utility page {
+	width: 100%;
+	max-width: var(--container-5xl);
+	margin-inline: auto;
+	padding-inline: 1rem;
+	@media (width >= 40rem) {
+		padding-inline: 2rem;
+	}
+}

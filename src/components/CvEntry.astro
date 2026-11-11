@@ -33,7 +33,7 @@ const { entry } = Astro.props;
 	.entry::before {
 		content: '';
 		position: absolute;
-		left: -1.5rem;
+		left: calc(-1.25rem - 6px); /* centres the 11px dot on the 1px line drawn by the section */
 		top: 0.45rem;
 		width: 11px;
 		height: 11px;

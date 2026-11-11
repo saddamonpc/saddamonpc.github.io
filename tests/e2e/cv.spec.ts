@@ -43,3 +43,28 @@ test('download buttons are greyed out until the PDFs exist', async ({ page }) =>
 	await page.keyboard.press('Enter');
 	await expect(page).toHaveURL(/\/cv\/$/);
 });
+
+test('timeline dots sit centred on the line', async ({ page }) => {
+	await page.goto('/cv/');
+	for (const entry of await page.locator('[data-cv-entry]').all()) {
+		const offset = await entry.evaluate((el) => {
+			const dot = getComputedStyle(el, '::before');
+			const dotCentre = el.getBoundingClientRect().left + Number.parseFloat(dot.left) + Number.parseFloat(dot.width) / 2;
+			const rail = el.parentElement!;
+			const lineCentre = rail.getBoundingClientRect().left + Number.parseFloat(getComputedStyle(rail).borderLeftWidth) / 2;
+			return Math.abs(dotCentre - lineCentre);
+		});
+		expect(offset).toBeLessThanOrEqual(0.5);
+	}
+});
+
+test('contact links show the full address with an icon, in the footer colour', async ({ page }) => {
+	await page.goto('/cv/');
+	const links = page.locator('[data-cv-links] a');
+	await expect(links).toHaveText(['saddamonpc@gmail.com', 'github.com/saddamonpc', 'linkedin.com/in/mohammad-saddam-mashuri']);
+	for (const link of await links.all()) {
+		await expect(link.locator('svg')).toHaveCount(1);
+		expect(await link.evaluate((el) => getComputedStyle(el).color)).toBe('rgb(167, 174, 168)');
+	}
+	await expect(links.nth(1)).toHaveAttribute('href', 'https://github.com/saddamonpc');
+});

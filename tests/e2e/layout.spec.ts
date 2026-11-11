@@ -65,3 +65,20 @@ test('footer has the four links and the copyright line', async ({ page }) => {
 	await expect(footerNav.getByRole('link', { name: 'rss' })).toHaveAttribute('href', '/rss.xml');
 	await expect(page.locator('footer')).toContainText(/© \d{4} Mohammad Saddam Mashuri · last updated \d{4}-\d{2}-\d{2}/);
 });
+
+test('page content lines up with the navbar on every page', async ({ page }) => {
+	await page.setViewportSize({ width: 1280, height: 900 });
+	for (const path of ['/', '/posts/', '/posts/sample-post/', '/projects/', '/projects/sample-project/', '/cv/', '/this-page-does-not-exist/']) {
+		await page.goto(path);
+		const content = async (selector: string) =>
+			page.locator(selector).first().evaluate((el) => {
+				const box = el.getBoundingClientRect();
+				const style = getComputedStyle(el);
+				return [box.left + Number.parseFloat(style.paddingLeft), box.right - Number.parseFloat(style.paddingRight)];
+			});
+		const [headerLeft, headerRight] = await content('[data-header-inner]');
+		const [pageLeft, pageRight] = await content('main [data-page]');
+		expect(Math.abs(pageLeft - headerLeft), `${path} left`).toBeLessThanOrEqual(1);
+		expect(Math.abs(pageRight - headerRight), `${path} right`).toBeLessThanOrEqual(1);
+	}
+});

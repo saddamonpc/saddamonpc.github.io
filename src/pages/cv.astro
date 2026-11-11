@@ -1,5 +1,6 @@
 ---
 // The CV page: /cv/ — all content comes from src/data/cv.ts.
+import { Icon } from 'astro-icon/components';
 import CvEntry from '../components/CvEntry.astro';
 import DownloadButton from '../components/DownloadButton.astro';
 import { cv } from '../data/cv';
@@ -11,14 +12,23 @@ const rail = 'ml-1.5 border-l border-line pl-5';
 ---
 
 <BaseLayout title="CV / résumé" current="cv">
-	<div class="mx-auto max-w-3xl px-4 py-8 sm:px-8">
+	<div data-page class="page py-8">
 		<div class="flex flex-wrap items-start justify-between gap-5">
 			<div>
 				<h1 class="mb-1 text-3xl leading-tight font-semibold text-strong">{cv.name}</h1>
 				<p class="mb-2">{cv.role}</p>
-				<p class="flex flex-wrap gap-x-4 font-mono text-xs">
-					{cv.links.map((link) => <a href={link.href} class="no-underline hover:underline">{link.label}</a>)}
-				</p>
+				<ul data-cv-links class="flex flex-wrap gap-x-5 gap-y-1 font-mono text-xs">
+					{
+						cv.links.map((link) => (
+							<li>
+								<a href={link.href} class="inline-flex items-center gap-1.5 text-muted no-underline hover:text-accent hover:underline">
+									<Icon name={link.icon} aria-hidden="true" class="size-4 shrink-0" />
+									{link.text}
+								</a>
+							</li>
+						))
+					}
+				</ul>
 			</div>
 			<div class="flex flex-col gap-2">
 				<DownloadButton label="Download CV" href={cv.pdf.cv} />

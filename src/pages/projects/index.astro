@@ -10,7 +10,7 @@ const projects = await getPublished('projects');
 ---
 
 <BaseLayout title="Projects" current="projects">
-	<div class="mx-auto max-w-5xl px-4 py-8 sm:px-8">
+	<div data-page class="page py-8">
 		<h1 class="text-3xl font-semibold text-strong">Projects</h1>
 		<p class="mt-1 text-muted">Things I've made as a programmer, a 3D artist, and a guitarist.</p>
 		<TagFilter tags={countTags(projects.map((project) => project.data))} />

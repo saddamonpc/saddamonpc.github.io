@@ -15,7 +15,7 @@ const recent = (await getPublished('posts')).slice(0, 3);
 ---
 
 <BaseLayout title={SITE_TITLE} current="home">
-	<div data-home class="mx-auto max-w-3xl px-4 py-8 sm:px-8">
+	<div data-page data-home class="page py-8">
 		<Image
 			src={profilePhoto}
 			alt="Photo of Mohammad Saddam Mashuri"
