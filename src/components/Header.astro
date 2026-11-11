@@ -156,7 +156,15 @@ const { current } = Astro.props;
 		}
 	}
 
-	button.addEventListener('click', () => setOpen(button.getAttribute('aria-expanded') !== 'true'));
+	// A quick second tap can reach us as two clicks a few milliseconds apart (Chrome reads it as a
+	// double-tap and adds a synthetic click). Treat clicks closer than 50ms as one tap; people can't tap that fast.
+	const SAME_TAP_MS = 50;
+	let lastToggle = -Infinity;
+	button.addEventListener('click', (event) => {
+		if (event.timeStamp - lastToggle < SAME_TAP_MS) return;
+		lastToggle = event.timeStamp;
+		setOpen(button.getAttribute('aria-expanded') !== 'true');
+	});
 	document.addEventListener('keydown', (event) => {
 		if (event.key === 'Escape' && button.getAttribute('aria-expanded') === 'true') {
 			setOpen(false);

@@ -73,11 +73,26 @@ test.describe('phone', () => {
 		await button.click();
 		await page.waitForTimeout(300);
 		await button.click(); // close: starts fading out
-		await button.click(); // open again straight away
+		await page.waitForTimeout(80); // a fast human second tap (clicks <50ms apart count as one tap)
+		await button.click(); // open again, mid-fade
 		await page.waitForTimeout(500);
 		await expect(button).toHaveAttribute('aria-expanded', 'true');
 		await expect(page.locator('#main-nav a').first()).toBeVisible();
 		expect(await page.locator('#main-nav').evaluate((el) => getComputedStyle(el).opacity)).toBe('1');
+	});
+
+	test('one tap that the browser delivers as two clicks toggles only once', async ({ page }) => {
+		// Seen on Chrome: a quick second tap arrives as a synthetic click plus the real one, ~4ms apart.
+		await page.goto('/');
+		await page.evaluate(async () => {
+			const button = document.querySelector<HTMLButtonElement>('button[aria-controls="main-nav"]')!;
+			button.click();
+			await new Promise((resolve) => setTimeout(resolve, 4));
+			button.click();
+		});
+		await page.waitForTimeout(400);
+		await expect(page.locator('button[aria-controls="main-nav"]')).toHaveAttribute('aria-expanded', 'true');
+		await expect(page.locator('#main-nav a').first()).toBeVisible();
 	});
 
 	test('the top bar stays on screen while scrolling', async ({ page }) => {
