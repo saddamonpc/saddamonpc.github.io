@@ -1,4 +1,6 @@
 ---
+// The navbar. On phones (with JavaScript on) the links fold behind a burger icon that opens a
+// full-screen menu, in the style of aleksandarkocic.net. Without JavaScript the links simply show.
 import { NAV_LINKS, type NavKey, SITE_TITLE } from '../consts';
 
 interface Props {
@@ -8,15 +10,14 @@ interface Props {
 const { current } = Astro.props;
 ---
 
-<header class="border-b border-line">
+<header class="border-b border-line bg-bg">
 	<div data-header-inner class="page flex flex-wrap items-baseline gap-x-6 gap-y-2 py-3">
-		<a href="/" class="font-serif text-lg font-semibold text-strong no-underline">{SITE_TITLE}</a>
-		<button
-			type="button"
-			class="menu-button ml-auto cursor-pointer rounded border border-line px-2.5 py-0.5 font-mono text-sm text-fg aria-expanded:border-accent aria-expanded:text-accent"
-			aria-expanded="false"
-			aria-controls="main-nav">☰ menu</button
-		>
+		<a href="/" class="brand font-serif text-lg font-semibold text-strong no-underline">{SITE_TITLE}</a>
+		<button type="button" class="menu-button ml-auto cursor-pointer text-fg" aria-label="Menu" aria-expanded="false" aria-controls="main-nav">
+			<!-- three lines when closed, an X when open -->
+			<svg class="icon-open" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" /></svg>
+			<svg class="icon-close" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+		</button>
 		<nav id="main-nav" aria-label="Main" class="ml-auto font-mono text-sm">
 			<ul class="flex flex-wrap justify-end gap-x-2">
 				{
@@ -38,38 +39,95 @@ const { current } = Astro.props;
 </header>
 
 <style>
-	/* The burger only exists on phones, and only when JavaScript is on. */
 	.menu-button {
+		display: none; /* phones only, see below */
+		line-height: 0;
+		opacity: 0.85;
+	}
+	.menu-button:hover {
+		opacity: 1;
+	}
+	.menu-button svg {
+		fill: none;
+		stroke: currentColor;
+		stroke-width: 2;
+		stroke-linecap: round;
+	}
+	.menu-button .icon-close,
+	.menu-button[aria-expanded='true'] .icon-open {
 		display: none;
 	}
+	.menu-button[aria-expanded='true'] .icon-close {
+		display: block;
+	}
+
+	/* Phones, with JavaScript on. */
 	@media (max-width: 639px) {
-		:global(.js) .menu-button {
-			display: inline-block;
+		/* The top bar stays on screen while scrolling. */
+		:global(.js) header {
+			position: sticky;
+			top: 0;
+			z-index: 40;
 		}
-		:global(.js) #main-nav {
-			width: 100%;
+		/* Name and burger stay above the open menu. */
+		:global(.js) .brand,
+		:global(.js) .menu-button {
+			position: relative;
+			z-index: 2;
+		}
+		:global(.js) .menu-button {
+			display: block;
+			align-self: center;
 		}
 		:global(.js) #main-nav:not(.open) {
 			display: none;
 		}
-		:global(.js) #main-nav ul {
+		/* The open menu: the whole screen, links stacked in the middle. */
+		:global(.js) #main-nav.open {
+			position: fixed;
+			inset: 0;
+			z-index: 1;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			background: var(--color-bg);
+			animation: menu-fade-in 0.2s ease-in;
+		}
+		:global(.js) #main-nav.open ul {
 			flex-direction: column;
+			align-items: center;
+			gap: 0.75rem;
 		}
-		:global(.js) #main-nav a {
-			padding: 0.5rem 0.25rem;
-			border-bottom: 1px solid var(--color-line);
+		:global(.js) #main-nav.open a {
+			font-size: 1.2rem;
+			padding: 0.2rem 0.6rem;
 		}
+	}
+	@keyframes menu-fade-in {
+		from {
+			opacity: 0;
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		:global(.js) #main-nav.open {
+			animation: none;
+		}
+	}
+	/* While the menu is open, the page behind it doesn't scroll. */
+	:global(html.menu-open) {
+		overflow: hidden;
 	}
 </style>
 
 <script>
 	const button = document.querySelector<HTMLButtonElement>('.menu-button')!;
 	const nav = document.getElementById('main-nav')!;
+	const phone = matchMedia('(max-width: 639px)');
 
 	function setOpen(open: boolean) {
 		nav.classList.toggle('open', open);
 		button.setAttribute('aria-expanded', String(open));
-		button.textContent = open ? '✕ close' : '☰ menu';
+		document.documentElement.classList.toggle('menu-open', open);
 	}
 
 	button.addEventListener('click', () => setOpen(button.getAttribute('aria-expanded') !== 'true'));
@@ -78,5 +136,9 @@ const { current } = Astro.props;
 			setOpen(false);
 			button.focus();
 		}
+	});
+	// Rotating a phone to a wide screen closes the menu.
+	phone.addEventListener('change', () => {
+		if (!phone.matches) setOpen(false);
 	});
 </script>

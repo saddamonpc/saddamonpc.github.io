@@ -27,22 +27,39 @@ test('nav stays right-aligned at any desktop width', async ({ page }) => {
 test.describe('phone', () => {
 	test.use({ viewport: { width: 375, height: 740 } });
 
-	test('burger toggles the menu', async ({ page }) => {
+	test('burger opens a full-screen menu with the links centred', async ({ page }) => {
 		await page.goto('/');
-		// Located by what it controls: its label changes from "☰ menu" to "✕ close".
 		const button = page.locator('button[aria-controls="main-nav"]');
-		await expect(button).toHaveText('☰ menu');
 		const links = page.locator('nav[aria-label="Main"] a');
+		await expect(button).toHaveAccessibleName('Menu');
 		await expect(button).toHaveAttribute('aria-expanded', 'false');
 		await expect(links.first()).toBeHidden();
+
 		await button.click();
 		await expect(button).toHaveAttribute('aria-expanded', 'true');
-		await expect(button).toHaveText('✕ close');
 		await expect(links).toHaveCount(4);
-		for (const link of await links.all()) await expect(link).toBeVisible();
+		for (const link of await links.all()) {
+			await expect(link).toBeVisible();
+			const box = (await link.boundingBox())!;
+			expect(Math.abs(box.x + box.width / 2 - 375 / 2), 'centred').toBeLessThanOrEqual(2);
+		}
+		const nav = (await page.locator('#main-nav').boundingBox())!;
+		expect(nav.height).toBeGreaterThanOrEqual(740 - 1); // covers the whole screen
+		expect(await page.evaluate(() => getComputedStyle(document.documentElement).overflow)).toBe('hidden'); // page behind can't scroll
+		await expect(button).toBeVisible(); // still there to close it
+
 		await page.keyboard.press('Escape');
 		await expect(links.first()).toBeHidden();
 		await expect(button).toBeFocused();
+		expect(await page.evaluate(() => getComputedStyle(document.documentElement).overflow)).not.toBe('hidden');
+	});
+
+	test('the top bar stays on screen while scrolling', async ({ page }) => {
+		await page.goto('/posts/sample-post/');
+		await page.mouse.wheel(0, 1500);
+		await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(500);
+		const header = (await page.locator('body > header').boundingBox())!;
+		expect(header.y).toBe(0);
 	});
 });
 
