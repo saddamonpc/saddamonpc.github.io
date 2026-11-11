@@ -95,6 +95,18 @@ test.describe('phone', () => {
 		await expect(page.locator('#main-nav a').first()).toBeVisible();
 	});
 
+	test('the open menu dims and blurs the page behind it', async ({ page }) => {
+		await page.goto('/');
+		await page.locator('button[aria-controls="main-nav"]').click();
+		await page.waitForTimeout(300);
+		const style = await page.locator('#main-nav').evaluate((el) => {
+			const s = getComputedStyle(el);
+			return { backdrop: s.backdropFilter || s.getPropertyValue('-webkit-backdrop-filter'), background: s.backgroundColor };
+		});
+		expect(style.backdrop).toContain('blur(');
+		expect(style.background).toMatch(/0\.8\)$/); // the page colour at 80% opacity
+	});
+
 	test('the top bar stays on screen while scrolling', async ({ page }) => {
 		await page.goto('/posts/sample-post/');
 		await page.mouse.wheel(0, 1500);

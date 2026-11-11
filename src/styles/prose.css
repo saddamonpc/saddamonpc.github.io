@@ -49,11 +49,7 @@
 	font-family: var(--font-mono);
 	font-weight: 400;
 	font-size: 0.85em;
-	background: linear-gradient(
-		90deg,
-		color-mix(in srgb, var(--color-accent) 14%, var(--color-code)),
-		color-mix(in srgb, var(--color-mint) 14%, var(--color-code))
-	);
+	background: var(--color-code);
 	border: 1px solid var(--color-line);
 	border-radius: 4px;
 	padding: 0.1em 0.35em;
@@ -63,24 +59,14 @@
 	content: none;
 }
 
-/* Code blocks, with the language shown top-right. */
-.prose pre {
-	position: relative;
-	border: 1px solid var(--color-line);
-	background-color: var(--color-code) !important;
+/* Code blocks are styled by Expressive Code: see ec.config.mjs. */
+/* A strip at the top for the language name and copy button, so neither covers the first line of code. */
+.prose .expressive-code .frame pre {
+	padding-top: 1.75rem;
+}
+.prose .expressive-code .frame pre[data-language]::before {
 	font-family: var(--font-mono);
-}
-/* Room at the top for the language label, so it never sits on the code (narrow screens). */
-.prose pre[data-language] {
-	padding-top: 2rem;
-}
-.prose pre[data-language]::after {
-	content: attr(data-language);
-	position: absolute;
-	top: 0.4rem;
-	right: 0.7rem;
-	font: 0.7rem var(--font-mono);
-	color: var(--color-muted);
+	top: 0.35rem;
 }
 
 /* Quotes: a pistachio-to-mint bar (top to bottom) and a faint gradient behind, no extra quotation marks. */

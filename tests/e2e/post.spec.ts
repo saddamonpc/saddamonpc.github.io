@@ -37,7 +37,7 @@ test('Obsidian extras render', async ({ page }) => {
 	await expect(page.locator('.wikilink-missing')).toHaveText('does-not-exist');
 	await expect(page.locator('main')).not.toContainText('hidden comment');
 	await expect(page.locator('iframe[src^="https://www.youtube-nocookie.com/embed/"]')).toHaveAttribute('title', /.+/);
-	await expect(page.locator('main figcaption').first()).toHaveText('A placeholder photo');
+	await expect(page.locator('.prose figure:not(.frame) figcaption').first()).toHaveText('A placeholder photo'); // .frame figures are code blocks
 });
 
 test('callouts use the three styles, unknown types fall back to note', async ({ page }) => {
@@ -82,23 +82,54 @@ test('the meta description is the post preview', async ({ page }) => {
 	await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /^This is a sample post\./);
 });
 
-test.describe('phone', () => {
-	test.use({ viewport: { width: 360, height: 760 } });
-
-	test('the code language label sits above the code, not over it', async ({ page }) => {
-		await page.goto(URL);
-		const room = await page.locator('.prose pre[data-language]').first().evaluate((pre) => {
-			const label = getComputedStyle(pre, '::after');
-			return Number.parseFloat(getComputedStyle(pre).paddingTop) - (Number.parseFloat(label.top) + Number.parseFloat(label.height));
-		});
-		expect(room).toBeGreaterThanOrEqual(0);
-	});
-});
-
-test('blockquotes and inline code get the gradient', async ({ page }) => {
+test('blockquotes get the gradient, inline code does not', async ({ page }) => {
 	await page.goto(URL);
 	const style = (selector: string) => page.locator(selector).first().evaluate((el) => getComputedStyle(el));
 	expect((await style('.prose blockquote:not(.callout)')).backgroundImage).toContain('linear-gradient');
 	expect((await style('.prose blockquote:not(.callout)')).borderImageSource).toContain('linear-gradient');
-	expect((await style('.prose :not(pre) > code')).backgroundImage).toContain('linear-gradient');
+	expect((await style('.prose :not(pre) > code')).backgroundImage).toBe('none'); // inline code stays plain
+});
+
+test.describe('code blocks on a phone', () => {
+	test.use({ viewport: { width: 360, height: 760 } });
+
+	test('long lines wrap instead of scrolling sideways', async ({ page }) => {
+		await page.goto(URL);
+		const pre = page.locator('.prose .expressive-code pre').first();
+		expect(await pre.evaluate((el) => el.scrollWidth - el.clientWidth)).toBeLessThanOrEqual(0);
+	});
+
+	test('every line is numbered once; wrapped rows line up under the code, not the numbers', async ({ page }) => {
+		await page.goto(URL);
+		const lines = page.locator('.prose .expressive-code').first().locator('.ec-line');
+		await expect(lines).toHaveCount(2);
+		await expect(lines.locator('.ln')).toHaveText(['1', '2']);
+		const second = lines.nth(1);
+		const number = (await second.locator('.gutter').boundingBox())!;
+		const code = (await second.locator('.code').boundingBox())!;
+		expect(code.height).toBeGreaterThan(30); // the print(...) line wraps onto several rows
+		expect(code.x).toBeGreaterThanOrEqual(number.x + number.width); // ...all of them right of the numbers
+	});
+
+	test('the language name and copy button sit above the code, not over it', async ({ page }) => {
+		await page.goto(URL);
+		const pre = page.locator('.prose .expressive-code pre[data-language]').first();
+		const room = await pre.evaluate((el) => {
+			const badge = getComputedStyle(el, '::before');
+			return Number.parseFloat(getComputedStyle(el).paddingTop) - (Number.parseFloat(badge.top) + Number.parseFloat(badge.height));
+		});
+		expect(room).toBeGreaterThanOrEqual(0);
+		expect(await pre.evaluate((el) => getComputedStyle(el, '::before').content)).toBe('"python"'); // the language name is shown
+	});
+});
+
+test('copy button copies the code without line numbers', async ({ page, context }) => {
+	await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+	await page.goto(URL);
+	const block = page.locator('.prose .expressive-code').first();
+	await block.hover();
+	await block.getByRole('button', { name: 'Copy to clipboard' }).click();
+	const copied = await page.evaluate(() => navigator.clipboard.readText());
+	expect(copied.startsWith('def log(chord, clean, total=6):')).toBe(true);
+	expect(copied).toContain('print(f"{chord}: {clean}/{total} strings clean")');
 });

@@ -91,7 +91,10 @@ const { current } = Astro.props;
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			background: var(--color-bg);
+			/* The page behind shows through, dimmed (80% page colour) and blurred. */
+			background: color-mix(in srgb, var(--color-bg) 80%, transparent);
+			-webkit-backdrop-filter: blur(8px);
+			backdrop-filter: blur(8px);
 			animation: menu-fade-in 0.2s ease-in;
 		}
 		/* Closing: fade out, then the script hides it. Taps go through to the page meanwhile. */
