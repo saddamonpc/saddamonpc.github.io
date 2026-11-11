@@ -16,7 +16,7 @@ const { tags } = Astro.props;
 			tags.map(({ tag, count }) => (
 				<button type="button" data-tag={tag} aria-pressed="false" class="filter-button">
 					{tag}
-					<span class="opacity-65">{count}</span>
+					<span class="ml-1 opacity-65">{count}</span>
 				</button>
 			))
 		}

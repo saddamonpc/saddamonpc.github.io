@@ -1,0 +1,30 @@
+---
+// One post on the posts page: date, title, picture strip, two-line preview, tags.
+import type { StripImage } from '../lib/images';
+import { entryUrl } from '../lib/content';
+import { formatDate } from '../lib/dates';
+import PictureStrip from './PictureStrip.astro';
+import TagPills from './TagPills.astro';
+
+interface Props {
+	id: string;
+	title: string;
+	date: Date;
+	tags: string[];
+	excerpt: string;
+	images: StripImage[];
+}
+
+const { id, title, date, tags, excerpt, images } = Astro.props;
+const url = entryUrl('posts', id);
+---
+
+<article data-tags={JSON.stringify(tags)} class="grid grid-cols-1 gap-x-3.5 border-b border-dotted border-line py-3 sm:grid-cols-[4rem_1fr]">
+	<time datetime={date.toISOString()} class="pt-1 font-mono text-xs text-muted">{formatDate(date, 'monthDay')}</time>
+	<div>
+		<a href={url} class="font-semibold no-underline hover:underline">{title}</a>
+		<PictureStrip images={images} postTitle={title} postUrl={url} />
+		<p class="excerpt mt-1 mb-1.5 line-clamp-2 text-[0.92em] leading-normal text-muted">{excerpt}</p>
+		<TagPills tags={tags} collection="posts" />
+	</div>
+</article>

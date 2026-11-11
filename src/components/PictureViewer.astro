@@ -1,0 +1,83 @@
+---
+// Full-size picture viewer for the picture strips, using the PhotoSwipe library.
+// PhotoSwipe handles ← → to flip, Esc to close, swiping on phones, and putting focus back where it was.
+---
+
+<script>
+	import PhotoSwipeLightbox from 'photoswipe/lightbox';
+	import 'photoswipe/style.css';
+	import type { StripImage } from '../lib/images';
+
+	type Strip = { title: string; url: string; images: StripImage[] };
+	let current: Strip | undefined;
+
+	const lightbox = new PhotoSwipeLightbox({
+		pswpModule: () => import('photoswipe'),
+		bgOpacity: 0.92,
+		showHideAnimationType: 'fade',
+	});
+
+	lightbox.on('uiRegister', () => {
+		// "caption · post title" under the picture
+		lightbox.pswp?.ui?.registerElement({
+			name: 'caption',
+			order: 9,
+			isButton: false,
+			appendTo: 'root',
+			onInit: (el, pswp) => {
+				el.className = 'pswp-caption';
+				pswp.on('change', () => {
+					const image = current?.images[pswp.currIndex];
+					el.textContent = image ? `${image.caption} · ${current?.title}` : '';
+				});
+			},
+		});
+		// "open post →" link
+		lightbox.pswp?.ui?.registerElement({
+			name: 'open-post',
+			order: 8,
+			isButton: false,
+			tagName: 'a',
+			appendTo: 'bar',
+			onInit: (el) => {
+				el.className = 'pswp-open-post';
+				el.textContent = 'open post →';
+				el.setAttribute('href', current?.url ?? '/posts/');
+			},
+		});
+	});
+	lightbox.init();
+
+	document.addEventListener('click', (event) => {
+		const button = (event.target as HTMLElement).closest<HTMLElement>('[data-strip] [data-index]');
+		if (!button) return;
+		current = JSON.parse(button.closest<HTMLElement>('[data-strip]')!.dataset.strip!) as Strip;
+		const slides = current.images.map((img) => ({ src: img.full, width: img.width, height: img.height, alt: img.caption }));
+		lightbox.loadAndOpen(Number(button.dataset.index), slides);
+	});
+</script>
+
+<style is:global>
+	.pswp-caption {
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		padding: 0.75rem 1rem;
+		text-align: center;
+		font-family: var(--font-mono);
+		font-size: 0.8rem;
+		color: var(--color-muted);
+		background: #101211cc;
+	}
+	.pswp-open-post {
+		align-self: center;
+		margin-right: 0.75rem;
+		font-family: var(--font-mono);
+		font-size: 0.8rem;
+		color: var(--color-accent);
+	}
+	.pswp__counter {
+		font-family: var(--font-mono);
+	}
+</style>

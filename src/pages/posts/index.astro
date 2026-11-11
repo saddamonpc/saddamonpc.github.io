@@ -1,0 +1,39 @@
+---
+// The posts page: /posts/ — every post, newest first, grouped by year, with a tag filter.
+import { render } from 'astro:content';
+import PictureViewer from '../../components/PictureViewer.astro';
+import PostRow from '../../components/PostRow.astro';
+import TagFilter from '../../components/TagFilter.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPublished } from '../../lib/collections';
+import { formatDate } from '../../lib/dates';
+import { stripImages } from '../../lib/images';
+import { countTags } from '../../lib/tags';
+
+const posts = await Promise.all(
+	(await getPublished('posts')).map(async (post) => {
+		const { remarkPluginFrontmatter: meta } = await render(post);
+		return { post, excerpt: meta.excerpt as string, images: await stripImages(post, meta.images) };
+	}),
+);
+
+const years = Map.groupBy(posts, ({ post }) => formatDate(post.data.date, 'year'));
+---
+
+<BaseLayout title="Posts" current="posts">
+	<div class="mx-auto max-w-3xl px-4 py-8 sm:px-8">
+		<h1 class="text-3xl font-semibold text-strong">Posts</h1>
+		<TagFilter tags={countTags(posts.map(({ post }) => post.data))} />
+		{
+			[...years].map(([year, entries]) => (
+				<section data-filter-group>
+					<h2 class="mt-6 mb-1 font-mono text-sm font-normal text-muted">{year}</h2>
+					{entries.map(({ post, excerpt, images }) => (
+						<PostRow id={post.id} title={post.data.title} date={post.data.date} tags={post.data.tags} excerpt={excerpt} images={images} />
+					))}
+				</section>
+			))
+		}
+	</div>
+	<PictureViewer />
+</BaseLayout>

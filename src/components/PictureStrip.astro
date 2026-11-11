@@ -1,0 +1,102 @@
+---
+// A row of tiny thumbnails of a post's pictures, under its title on the posts page.
+// Hover (or keyboard focus) shows a bigger preview; click / Enter / tap opens the viewer (PictureViewer).
+import type { StripImage } from '../lib/images';
+
+interface Props {
+	images: StripImage[];
+	postTitle: string;
+	postUrl: string;
+}
+
+const MAX_THUMBS = 6;
+const { images, postTitle, postUrl } = Astro.props;
+const strip = JSON.stringify({ title: postTitle, url: postUrl, images });
+---
+
+{
+	images.length > 0 && (
+		<div class="thumbs mt-1.5 flex flex-wrap items-center gap-1.5" data-strip={strip}>
+			{images.slice(0, MAX_THUMBS).map((img, i) => (
+				<button type="button" class="thumb" data-index={i} aria-label={`View picture ${i + 1} of ${images.length}: ${img.caption}`}>
+					<img src={img.thumb} alt="" loading="lazy" decoding="async" />
+					<span class="pop">
+						<img src={img.preview} alt="" loading="lazy" decoding="async" />
+					</span>
+				</button>
+			))}
+			{images.length > MAX_THUMBS && (
+				<button type="button" class="more" data-index={MAX_THUMBS} aria-label={`View ${images.length - MAX_THUMBS} more pictures`}>
+					+{images.length - MAX_THUMBS}
+				</button>
+			)}
+		</div>
+	)
+}
+
+<style>
+	.thumb {
+		position: relative;
+		padding: 0;
+		line-height: 0;
+		cursor: zoom-in;
+		border: 1px solid var(--color-line);
+		border-radius: 3px;
+	}
+	.thumb:hover {
+		border-color: var(--color-accent);
+	}
+	.thumb > img {
+		width: 44px;
+		height: 30px;
+		object-fit: cover;
+		border-radius: 2px;
+	}
+	.more {
+		height: 32px;
+		padding: 0 0.5rem;
+		cursor: pointer;
+		font-family: var(--font-mono);
+		font-size: 0.72rem;
+		color: var(--color-muted);
+		border: 1px dashed var(--color-line);
+		border-radius: 3px;
+	}
+	/* Bigger preview: only where there is a mouse to hover with. */
+	.pop {
+		display: none;
+		position: absolute;
+		z-index: 10;
+		left: 50%;
+		bottom: calc(100% + 8px);
+		transform: translateX(-50%);
+		padding: 4px;
+		background: var(--color-bg);
+		border: 1px solid var(--color-accent);
+		border-radius: 6px;
+		box-shadow: 0 8px 24px #000a;
+		pointer-events: none;
+	}
+	.pop img {
+		width: 260px;
+		max-width: none;
+		height: auto;
+		border-radius: 3px;
+	}
+	@media (hover: hover) {
+		.thumb:hover .pop,
+		.thumb:focus-visible .pop {
+			display: block;
+		}
+	}
+	/* Bigger targets for fingers. */
+	@media (hover: none) {
+		.thumb > img {
+			width: 52px;
+			height: 38px;
+		}
+		.more {
+			height: 40px;
+		}
+	}
+</style>
