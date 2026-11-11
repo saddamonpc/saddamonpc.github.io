@@ -1,10 +1,50 @@
 ---
+// The home page: greeting, photo, bio, and the 3 newest posts.
+import { Image } from 'astro:assets';
+import profilePhoto from '../assets/prof_pic.jpg';
+import TagPills from '../components/TagPills.astro';
 import { SITE_TITLE } from '../consts';
+import { Content as Bio } from '../content/bio.md';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getPublished } from '../lib/collections';
+import { entryUrl } from '../lib/content';
+import { formatDate } from '../lib/dates';
+import '../styles/prose.css';
+
+const recent = (await getPublished('posts')).slice(0, 3);
 ---
 
 <BaseLayout title={SITE_TITLE} current="home">
-	<div class="mx-auto max-w-3xl px-4 py-8 sm:px-8">
-		<h1 class="text-2xl font-semibold text-strong">Hi! I'm Mohammad Saddam Mashuri.</h1>
+	<div data-home class="mx-auto max-w-3xl px-4 py-8 sm:px-8">
+		<Image
+			src={profilePhoto}
+			alt="Photo of Mohammad Saddam Mashuri"
+			width={480}
+			class="float-right mb-4 ml-6 w-[32%] rounded"
+			loading="eager"
+		/>
+		<h1 class="mb-3 text-3xl leading-tight font-semibold text-strong">Hi! I'm Mohammad Saddam Mashuri.</h1>
+		<div data-bio class="prose max-w-none [&_strong]:text-strong">
+			<Bio />
+		</div>
+
+		<h2 class="clear-both mt-10 mb-2 font-mono text-sm font-normal text-muted">recent posts</h2>
+		<ul data-recent>
+			{
+				recent.map((post) => (
+					<li class="flex flex-wrap items-baseline gap-x-3.5 border-b border-dotted border-line py-1.5">
+						<time datetime={post.data.date.toISOString()} class="min-w-24 font-mono text-xs text-muted">
+							{formatDate(post.data.date, 'iso')}
+						</time>
+						<a href={entryUrl('posts', post.id)} class="no-underline hover:underline">
+							{post.data.title}
+						</a>
+						<span class="ml-auto">
+							<TagPills tags={post.data.tags} collection="posts" />
+						</span>
+					</li>
+				))
+			}
+		</ul>
 	</div>
 </BaseLayout>
