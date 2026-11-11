@@ -1,5 +1,6 @@
 // @ts-check
 import sitemap from '@astrojs/sitemap';
+import { unified } from '@astrojs/markdown-remark';
 import tailwindcss from '@tailwindcss/vite';
 import rehypeFigure from '@microflash/rehype-figure';
 import { defineConfig, fontProviders } from 'astro/config';
@@ -24,16 +25,18 @@ export default defineConfig({
 	markdown: {
 		// Code colours. Everforest is a green-tinted dark theme that sits well with the site's palette.
 		shikiConfig: { theme: 'everforest-dark' },
-		remarkPlugins: [
-			[remarkObsidian, { resolveLink: buildLinkIndex('./src/content') }], // [[links]], ![[embeds]], %%comments%%, YouTube
-			remarkFlexibleMarkers, // ==highlight==
-			remarkReadingTime, // "N min read"
-			remarkPostMeta, // preview text and picture list for the posts page
-		],
-		rehypePlugins: [
-			[rehypeCallouts, { theme: 'obsidian', showIndicator: false }], // > [!tip] callouts
-			rehypeFigure, // a picture on its own line gets a caption
-		],
+		processor: unified({
+			remarkPlugins: [
+				[remarkObsidian, { resolveLink: buildLinkIndex('./src/content') }], // [[links]], ![[embeds]], %%comments%%, YouTube
+				remarkFlexibleMarkers, // ==highlight==
+				remarkReadingTime, // "N min read"
+				remarkPostMeta, // preview text and picture list for the posts page
+			],
+			rehypePlugins: [
+				[rehypeCallouts, { theme: 'obsidian', showIndicator: false }], // > [!tip] callouts
+				rehypeFigure, // a picture on its own line gets a caption
+			],
+		}),
 	},
 
 	// Fonts are downloaded at build time and served from this site (no requests to Google at runtime).
