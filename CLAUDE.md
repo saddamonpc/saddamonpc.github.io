@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Personal website of M. Saddam Mashuri, built with Astro and Tailwind CSS and deployed to GitHub Pages at https://saddamonpc.github.io/.
+Personal website of M. Saddam Mashuri, built with Astro and Tailwind CSS and deployed to GitHub Pages at https://msmashuri.com/ (custom domain; the repo is saddamonpc/saddamonpc.github.io).
 
 Read `README.md` first: it explains the folders, the commands, and how posts are written (Obsidian-friendly Markdown in `src/content/`).
 

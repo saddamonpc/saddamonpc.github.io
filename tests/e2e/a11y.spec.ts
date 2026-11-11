@@ -29,7 +29,7 @@ test('RSS feed lists posts with their preview', async ({ request }) => {
 	expect(res.status()).toBe(200);
 	const xml = await res.text();
 	expect(xml).toContain('<title>Sample post: everything this site can render</title>');
-	expect(xml).toContain('<link>https://saddamonpc.github.io/posts/sample-post/</link>');
+	expect(xml).toContain('<link>https://msmashuri.com/posts/sample-post/</link>');
 	expect(xml).toMatch(/<description>This is a sample post\./);
 });
 

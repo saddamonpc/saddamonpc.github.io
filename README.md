@@ -1,4 +1,6 @@
-# saddamonpc.github.io
+# msmashuri.com
+
+Source of https://msmashuri.com/ (GitHub repo `saddamonpc/saddamonpc.github.io`).
 
 My personal website: thoughts, guitar, ZBrush, Houdini, drawing, and my CV. Built with [Astro](https://astro.build) and [Tailwind CSS](https://tailwindcss.com).
 

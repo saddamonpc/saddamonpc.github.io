@@ -18,7 +18,8 @@ const SHOW_DRAFTS = process.env.SHOW_DRAFTS === '1' || process.argv.includes('de
 
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://saddamonpc.github.io',
+	// The site's address: used for link previews, the RSS feed and the sitemap.
+	site: 'https://msmashuri.com',
 
 	// Every page URL ends in "/". This keeps relative links to audio files beside a post working.
 	trailingSlash: 'always',
