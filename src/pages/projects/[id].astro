@@ -1,0 +1,29 @@
+---
+// One page per project: /projects/<folder>/
+import { render } from 'astro:content';
+import EntryLayout from '../../layouts/EntryLayout.astro';
+import { getPublished } from '../../lib/collections';
+
+export async function getStaticPaths() {
+	const projects = await getPublished('projects');
+	return projects.map((project) => ({ params: { id: project.id }, props: { project } }));
+}
+
+const { project } = Astro.props;
+const { Content, headings, remarkPluginFrontmatter } = await render(project);
+const { title, date, tags, cover, category, tools, timeframe } = project.data;
+---
+
+<EntryLayout
+	collection="projects"
+	title={title}
+	date={date}
+	tags={tags}
+	cover={cover}
+	headings={headings}
+	readingMinutes={remarkPluginFrontmatter.readingMinutes}
+	description={remarkPluginFrontmatter.excerpt}
+	facts={{ category, tools, timeframe }}
+>
+	<Content />
+</EntryLayout>
