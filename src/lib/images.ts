@@ -14,7 +14,7 @@ export interface StripImage {
 }
 
 // Every picture under src/content, so a post's "./photo.jpg" can be turned into an optimisable image.
-const contentImages = import.meta.glob<ImageMetadata>('/src/content/**/*.{jpg,jpeg,png,webp,avif,gif}', {
+const contentImages = import.meta.glob<ImageMetadata>('/src/content/**/*.{jpg,jpeg,png,webp,avif,gif,JPG,JPEG,PNG,WEBP,AVIF,GIF}', {
 	eager: true,
 	import: 'default',
 });

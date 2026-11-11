@@ -97,3 +97,28 @@ describe('inline extras', () => {
 		expect(html).toContain('<p>after</p>');
 	});
 });
+
+describe('review fixes', () => {
+	test('%%comments%% containing formatting are removed completely', () => {
+		const html = render('Short. %% my *private* note %% end');
+		expect(html).not.toContain('private');
+		expect(html).toContain('Short.');
+		expect(html).toContain('end');
+	});
+
+	test('a %% block %% spanning blank lines is removed completely', () => {
+		const html = render('%%\nline one\n\nline two\n%%\n\nafter');
+		expect(html).not.toContain('line one');
+		expect(html).not.toContain('line two');
+		expect(html).toContain('<p>after</p>');
+	});
+
+	test('%% inside code is left alone', () => {
+		expect(render('`a %% b`')).toContain('<code>a %% b</code>');
+	});
+
+	test('vault-rooted paths from Obsidian still point at the file beside the note', () => {
+		expect(render('![[posts/foo/render.jpg]]')).toContain('<img src="./render.jpg"');
+		expect(render('[[projects/sample-project/sample-project|x]]')).toContain('href="/projects/sample-project/"');
+	});
+});

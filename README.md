@@ -49,12 +49,16 @@ Open `src/content/` as a vault in Obsidian. Its settings (in `src/content/.obsid
 
 4. Write. The page appears at `/posts/barre-chords/`.
 
+Only the note named like its folder is published. Other notes in the folder (an Obsidian `Untitled.md`, a to-do list) are ignored. After adding a **new folder**, restart `npm run dev` so the site notices it.
+
+`src/content/posts/sample-post/`, `src/content/posts/test-newer-post/` and `src/content/projects/sample-project/` are drafts: they show in `npm run dev` and in the tests, never on the real site. Keep them, because the tests use them.
+
 Projects work the same way in `src/content/projects/`, and can also have `category`, `tools: [ZBrush, Blender]` and `timeframe: Sep – Oct 2026`, which show in a strip under the title.
 
 ### What works
 
 - Normal Markdown: headings, **bold**, _italic_, links, lists, tables, `code`, footnotes.
-- Obsidian extras: `==highlight==`, `%%hidden comments%%`, callouts (`> [!tip]`, `> [!note]`, `> [!warning]` and Obsidian's other types, plus foldable `> [!note]-`).
+- Obsidian extras: `==highlight==`, `%%hidden comments%%` (hidden on the site, but this repo is public, so anyone can read them on GitHub, like drafts), callouts (`> [!tip]`, `> [!note]`, `> [!warning]` and Obsidian's other types, plus foldable `> [!note]-`).
 - Links to other notes: `[[sample-project]]`, `[[sample-project|your own text]]`, `[[sample-project#A heading]]`.
 - Pictures: `![[photo.jpg]]`, `![[photo.jpg|caption]]`, or `![caption](./photo.jpg)`. The caption shows under the picture and is read aloud to people who can't see it, so add one where you can.
 - Audio: `![[take.mp3|Title · recorded 2026-10-18]]`, with the file in the same folder (mp3, m4a, wav, ogg).

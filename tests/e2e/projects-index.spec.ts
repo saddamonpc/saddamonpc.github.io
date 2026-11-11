@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 test('projects page shows cards', async ({ page }) => {
 	await page.goto('/projects/');
 	await expect(page.locator('h1')).toHaveText('Projects');
-	const card = page.locator('[data-tags]').first();
+	const card = page.locator('[data-tags]', { hasText: 'Sample project' });
 	await expect(card.getByRole('link').first()).toHaveAttribute('href', '/projects/sample-project/');
 	const cover = card.locator('img').first();
 	expect(await cover.getAttribute('src')).toContain('/_astro/');
@@ -14,8 +14,9 @@ test('projects page shows cards', async ({ page }) => {
 
 test('filtering projects by tag', async ({ page }) => {
 	await page.goto('/projects/');
-	await page.getByRole('button', { name: /^zbrush\s*1$/ }).click();
-	await expect(page.getByText('showing 1 of 1')).toBeVisible();
+	await page.getByRole('button', { name: /^zbrush\s*\d+$/ }).click();
+	await expect(page.getByText(/showing \d+ of \d+/)).toBeVisible();
+	await expect(page.locator('[data-tags]', { hasText: 'Sample project' })).toBeVisible();
 });
 
 test('grid has 3 columns on wide screens and 1 on phones', async ({ page }) => {

@@ -17,3 +17,11 @@ export function entryUrl(collection: CollectionName, id: string): string {
 export function tagUrl(collection: CollectionName, tag: string): string {
 	return `/${collection}/?tag=${encodeURIComponent(tag)}`;
 }
+
+/**
+ * Obsidian's "Date & time" property writes `2026-11-02T03:00` with no timezone, which JavaScript would read
+ * as local time (so the day could differ between computers). Treat it as UTC, like plain dates.
+ */
+export function utcDate(value: unknown): unknown {
+	return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?$/.test(value) ? `${value}Z` : value;
+}

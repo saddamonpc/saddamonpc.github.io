@@ -27,6 +27,9 @@ test('recent posts', async ({ page }) => {
 	await expect(page.getByText('recent posts', { exact: true })).toBeVisible();
 	const rows = page.locator('[data-recent] > li');
 	expect(await rows.count()).toBeLessThanOrEqual(3);
-	await expect(rows.first().getByRole('link').first()).toHaveAttribute('href', '/posts/sample-post/');
-	await expect(rows.first()).toContainText('2026-11-02');
+	// Newest first: the newer test post comes before the sample.
+	await expect(rows.first()).toContainText('Test: a newer post');
+	const row = rows.filter({ hasText: 'Sample post' });
+	await expect(row.getByRole('link').first()).toHaveAttribute('href', '/posts/sample-post/');
+	await expect(row).toContainText('2026-11-02');
 });

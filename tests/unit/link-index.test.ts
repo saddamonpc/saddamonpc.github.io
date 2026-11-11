@@ -16,3 +16,11 @@ test('maps note names to page addresses', () => {
 	expect(resolve('b')).toBe('/projects/b/');
 	expect(resolve('c')).toBeNull();
 });
+
+test('drafts are not linked unless asked', () => {
+	const dir = mkdtempSync(join(tmpdir(), 'links-'));
+	mkdirSync(join(dir, 'posts', 'd'), { recursive: true });
+	writeFileSync(join(dir, 'posts', 'd', 'd.md'), '---\ntitle: D\ndraft: true\n---\n');
+	expect(buildLinkIndex(dir)('d')).toBeNull();
+	expect(buildLinkIndex(dir, { includeDrafts: true })('d')).toBe('/posts/d/');
+});

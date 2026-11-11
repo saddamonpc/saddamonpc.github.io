@@ -10,7 +10,8 @@
 // turns pictures into raw HTML, so Astro can't optimise them, and remark-obsidian has no picture or
 // audio embeds and can't point links at /posts/<folder>/.
 import { slug } from 'github-slugger';
-import type { Html, Image, Link, PhrasingContent, Root, Text } from 'mdast';
+import type { Html, Image, Link, Parent, PhrasingContent, Root, Text } from 'mdast';
+import type { Node } from 'unist';
 import { SKIP, visit } from 'unist-util-visit';
 import type { VFile } from 'vfile';
 
@@ -74,14 +75,33 @@ function unknownCalloutsToNotes(tree: Root) {
 	});
 }
 
+// %%comments%% can contain formatting and links, and can span several paragraphs.
+// Walk the whole note in order, dropping everything between %% markers. Code is never touched.
 function removeComments(tree: Root) {
-	visit(tree, 'text', (node) => {
-		node.value = node.value.replace(/%%[\s\S]*?%%/g, '');
-	});
+	let inside = false;
+	const walk = (parent: Parent) => {
+		parent.children = parent.children.filter((node: Node) => {
+			if (node.type === 'text') {
+				const text = node as Text;
+				let kept = '';
+				text.value.split('%%').forEach((part, i) => {
+					if (i > 0) inside = !inside;
+					if (!inside) kept += part;
+				});
+				text.value = kept;
+				return kept !== '';
+			}
+			if (!('children' in node)) return !inside;
+			const container = node as Parent;
+			const before = container.children.length;
+			walk(container);
+			return before === 0 || container.children.length > 0;
+		}) as Parent['children'];
+	};
+	walk(tree);
 	visit(tree, 'paragraph', (node, index, parent) => {
 		if (!parent || index === undefined) return;
-		const empty = node.children.every((child) => child.type === 'text' && child.value.trim() === '');
-		if (empty) {
+		if (node.children.every((child) => child.type === 'text' && child.value.trim() === '')) {
 			parent.children.splice(index, 1);
 			return [SKIP, index];
 		}
@@ -103,7 +123,8 @@ function splitText(value: string, resolveLink: ObsidianOptions['resolveLink'], f
 }
 
 function embed(target: string, resolveLink: ObsidianOptions['resolveLink'], file: VFile): PhrasingContent {
-	const [name, extra = ''] = splitPipe(target);
+	const [path, extra = ''] = splitPipe(target);
+	const name = lastSegment(path); // attachments always sit beside the note
 	if (IMAGE.test(name)) {
 		const alt = OBSIDIAN_SIZE.test(extra) ? '' : extra;
 		return { type: 'image', url: `./${name}`, alt, title: null } satisfies Image;
@@ -122,7 +143,7 @@ function embed(target: string, resolveLink: ObsidianOptions['resolveLink'], file
 function wikilink(target: string, resolveLink: ObsidianOptions['resolveLink'], file: VFile): PhrasingContent {
 	const [ref, label] = splitPipe(target);
 	const [name, heading] = ref.split('#').map((part) => part.trim());
-	const url = resolveLink(name);
+	const url = resolveLink(lastSegment(name));
 	const shown = label || heading || name;
 	if (!url) {
 		console.warn(`[obsidian] ${file.path ?? 'a note'}: no post or project named "${name}"`);
@@ -157,6 +178,8 @@ function youTubeEmbed(id: string, title: string): string {
 	);
 }
 
+// Obsidian writes [[posts/foo/note]] when a name isn't unique in the vault.
+const lastSegment = (path: string) => path.split('/').pop() ?? path;
 const text = (value: string): Text => ({ type: 'text', value });
 const blockHtml = (value: string): Html => ({ type: 'html', value, data: { block: true } as Html['data'] });
 const splitPipe = (target: string): [string, string] => {

@@ -2,8 +2,8 @@ import { expect, test } from '@playwright/test';
 
 test('audio stored beside a post is playable from the post page', async ({ page, request }) => {
 	await page.goto('/posts/sample-post/');
-	await expect(page.locator('audio[src="./sample-take.wav"]')).toHaveCount(1);
-	const res = await request.get('/posts/sample-post/sample-take.wav');
+	await expect(page.locator('audio[src="./sample-take.WAV"]')).toHaveCount(1);
+	const res = await request.get('/posts/sample-post/sample-take.WAV');
 	expect(res.status()).toBe(200);
 	expect(res.headers()['content-type']).toMatch(/audio\/(x-)?wav/);
 });

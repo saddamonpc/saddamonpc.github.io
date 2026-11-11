@@ -13,6 +13,9 @@ import { remarkObsidian } from './src/lib/markdown/remark-obsidian.ts';
 import { remarkPostMeta } from './src/lib/markdown/remark-post-meta.ts';
 import { rehypeTaskLabels } from './src/lib/markdown/rehype-task-labels.ts';
 
+// Drafts are visible in `npm run dev` and in the tests (SHOW_DRAFTS=1), never on the real site.
+const SHOW_DRAFTS = process.env.SHOW_DRAFTS === '1' || process.argv.includes('dev');
+
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://saddamonpc.github.io',
@@ -28,7 +31,7 @@ export default defineConfig({
 		shikiConfig: { theme: 'everforest-dark' },
 		processor: unified({
 			remarkPlugins: [
-				[remarkObsidian, { resolveLink: buildLinkIndex('./src/content') }], // [[links]], ![[embeds]], %%comments%%, YouTube
+				[remarkObsidian, { resolveLink: buildLinkIndex('./src/content', { includeDrafts: SHOW_DRAFTS }) }], // [[links]], ![[embeds]], %%comments%%, YouTube
 				remarkFlexibleMarkers, // ==highlight==
 				remarkReadingTime, // "N min read"
 				remarkPostMeta, // preview text and picture list for the posts page
@@ -71,7 +74,7 @@ export default defineConfig({
 			viteStaticCopy({
 				silent: true, // fine if a folder has no audio yet
 				targets: ['posts', 'projects'].map((collection) => ({
-					src: `src/content/${collection}/*/*.{mp3,m4a,wav,ogg}`,
+					src: `src/content/${collection}/*/*.{mp3,m4a,wav,ogg,MP3,M4A,WAV,OGG}`, // phones often write .MP3
 					dest: collection,
 					rename: { stripBase: 3 },
 				})),
