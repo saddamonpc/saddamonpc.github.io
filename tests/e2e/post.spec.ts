@@ -133,3 +133,34 @@ test('copy button copies the code without line numbers', async ({ page, context 
 	expect(copied.startsWith('def log(chord, clean, total=6):')).toBe(true);
 	expect(copied).toContain('print(f"{chord}: {clean}/{total} strings clean")');
 });
+
+test('code block top strip: language on the left, copy button on the right, both always visible', async ({ page }) => {
+	await page.setViewportSize({ width: 1280, height: 900 });
+	await page.goto(URL);
+	const block = page.locator('.prose .expressive-code').first();
+	const pre = block.locator('pre[data-language]');
+	const badge = await pre.evaluate((el) => {
+		const s = getComputedStyle(el, '::before');
+		return { left: Number.parseFloat(s.left), opacity: s.opacity };
+	});
+	const button = block.getByRole('button', { name: 'Copy to clipboard' });
+	await expect(button).toBeVisible();
+	expect(Number(await button.evaluate((el) => getComputedStyle(el).opacity))).toBeGreaterThanOrEqual(0.75); // without hovering
+	const preBox = (await pre.boundingBox())!;
+	const buttonBox = (await button.boundingBox())!;
+	expect(badge.left).toBeLessThan(preBox.width / 2); // language on the left
+	expect(buttonBox.x).toBeGreaterThan(preBox.x + preBox.width / 2); // copy on the right
+	await block.hover();
+	expect(await pre.evaluate((el) => getComputedStyle(el, '::before').opacity)).toBe('1'); // language stays while hovering
+	// A separator line between the strip and the code.
+	expect(await pre.evaluate((el) => getComputedStyle(el).backgroundImage)).toContain('linear-gradient');
+});
+
+test.describe('code block on a phone', () => {
+	test.use({ viewport: { width: 360, height: 760 } });
+
+	test('has no copy button', async ({ page }) => {
+		await page.goto(URL);
+		await expect(page.locator('.prose .expressive-code').first().getByRole('button', { name: 'Copy to clipboard' })).toBeHidden();
+	});
+});
