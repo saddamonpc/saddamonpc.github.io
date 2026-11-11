@@ -11,6 +11,7 @@ import { viteStaticCopy } from 'vite-plugin-static-copy';
 import { buildLinkIndex } from './src/lib/markdown/link-index.ts';
 import { remarkObsidian } from './src/lib/markdown/remark-obsidian.ts';
 import { remarkPostMeta } from './src/lib/markdown/remark-post-meta.ts';
+import { rehypeTaskLabels } from './src/lib/markdown/rehype-task-labels.ts';
 
 // https://astro.build/config
 export default defineConfig({
@@ -35,6 +36,7 @@ export default defineConfig({
 			rehypePlugins: [
 				[rehypeCallouts, { theme: 'obsidian', showIndicator: false }], // > [!tip] callouts
 				rehypeFigure, // a picture on its own line gets a caption
+				rehypeTaskLabels, // checklist boxes say "done" / "not done" to screen readers
 			],
 		}),
 	},
