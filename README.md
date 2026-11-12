@@ -35,9 +35,16 @@ Pushing to `main` on GitHub runs the tests and deploys the site automatically.
 
 Open `src/content/` as a vault in Obsidian. Its settings (in `src/content/.obsidian/`) already put pasted pictures next to the note you're writing.
 
-1. Make a folder in `src/content/posts/` named like the page address you want, e.g. `barre-chords`. Use lowercase and dashes.
-2. Inside it, make a note with the **same name**: `barre-chords/barre-chords.md`. (Same name, so Obsidian's `[[barre-chords]]` links can find it.)
-3. Start the note with this frontmatter:
+1. Make a folder in `src/content/posts/` named like the page address you want, e.g. `barre-chords`. Use lowercase letters, numbers and dashes, and keep it short: the title can be long, the folder name can't change once the post is out (it's the address people link to).
+
+   | Title                                                      | Folder                         |
+   | ---------------------------------------------------------- | ------------------------------ |
+   | Learning barre chords, again (part 2): what finally worked | `barre-chords-part-2`          |
+   | ZBrush → Blender: retopology for 3D prints                 | `zbrush-to-blender-retopology` |
+   | Kenapa saya belajar gitar lagi?                            | `kenapa-belajar-gitar-lagi`    |
+
+2. Inside it, make a note with the **same name**: `barre-chords/barre-chords.md`. (Same name, so Obsidian's `[[barre-chords]]` links can find it.) If you rename one in Obsidian, rename the other too.
+3. Fill the note in with the template: run "Templates: Insert template" (Ctrl+P) and pick `post` (or `project`). It adds today's date and `draft: true`. Turn on Obsidian's **Templates** core plugin once first (Settings, Core plugins); the template folder `_templates` is already set. The frontmatter looks like this:
 
    ```yaml
    ---
