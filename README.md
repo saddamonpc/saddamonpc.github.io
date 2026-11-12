@@ -15,6 +15,7 @@ You need Node.js 22.23 or newer.
 | `npm run build`    | Build the final site into `dist/`                              |
 | `npm test`         | Run the unit tests                                             |
 | `npm run test:e2e` | Build the site and test it in a real browser                   |
+| `npm run pull`     | Get the latest from GitHub; use it instead of `git pull` (below) |
 
 Pushing to `main` on GitHub runs the tests and deploys the site automatically.
 
@@ -64,6 +65,14 @@ Only the note named like its folder is published. Other notes in the folder (an 
 `src/content/posts/sample-post/`, `src/content/posts/test-newer-post/` and `src/content/projects/sample-project/` are drafts: they show in `npm run dev` and in the tests, never on the real site. Keep them, because the tests use them.
 
 Projects work the same way in `src/content/projects/`, and can also have `category`, `tools: [ZBrush, Blender]` and `timeframe: Sep – Oct 2026`, which show in a strip under the title.
+
+### Writing on several computers (Obsidian Sync)
+
+Obsidian Sync moves your writing between computers (and your phone) as you type. Git publishes it. Unpublished drafts never need to go to GitHub, so they stay private.
+
+- **Each computer, once:** clone this repo, open `src/content/` as a vault, and connect it to the same remote vault in Settings → Sync. Turn on syncing images, audio, videos and other file types there too.
+- **Before working:** run `npm run pull` instead of `git pull`. Plain `git pull` (and VS Code's sync button) refuses whenever Sync has already brought the files a pull would bring. `npm run pull` checks they're identical to GitHub's, then pulls. If something differs, it stops and changes nothing: usually Sync hasn't finished yet, so wait a moment and run it again.
+- **Publishing:** commit only the finished post's folder, not everything: `git add src/content/posts/barre-chords`, then commit and push. Drafts stay out of git.
 
 ### What works
 
