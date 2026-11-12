@@ -43,6 +43,7 @@ Open `src/content/` as a vault in Obsidian. Its settings (in `src/content/.obsid
    ---
    title: Learning barre chords, again
    date: 2026-10-18
+   updated: 2026-11-02 # optional: add when you change the post later
    tags: [guitar, practice]
    cover: ./cover.jpg # optional header image, in the same folder
    draft: true # optional: shows in `npm run dev`, hidden on the real site
