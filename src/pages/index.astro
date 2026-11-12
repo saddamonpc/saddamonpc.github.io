@@ -1,10 +1,11 @@
 ---
-// The home page: greeting, photo, bio, and the 3 newest posts.
+// The home page: greeting, bio, photo with a caption, and the 3 newest posts.
+// The bio and the photo caption are written in src/content/bio.md.
 import { Image } from 'astro:assets';
 import profilePhoto from '../assets/prof_pic.jpg';
 import TagPills from '../components/TagPills.astro';
 import { SITE_TITLE } from '../consts';
-import { Content as Bio } from '../content/bio.md';
+import { Content as Bio, frontmatter as bio } from '../content/bio.md';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getPublished } from '../lib/collections';
 import { entryUrl } from '../lib/content';
@@ -16,35 +17,75 @@ const recent = (await getPublished('posts')).slice(0, 3);
 
 <BaseLayout title={SITE_TITLE} current="home">
 	<div data-page data-home class="page py-8">
-		<Image
-			src={profilePhoto}
-			alt="Photo of Mohammad Saddam Mashuri"
-			width={480}
-			class="float-right mb-4 ml-6 w-[32%] rounded"
-			loading="eager"
-		/>
-		<h1 class="mb-3 text-3xl leading-tight font-semibold text-strong">Hi! I'm Mohammad Saddam Mashuri.</h1>
-		<div data-bio class="prose max-w-none [&_strong]:text-strong">
-			<Bio />
+		<div class="intro">
+			<h1 class="intro-title text-3xl leading-tight font-semibold text-strong">Hi! I'm Mohammad Saddam Mashuri.</h1>
+			<figure class="intro-photo">
+				<Image src={profilePhoto} alt="Photo of Mohammad Saddam Mashuri" width={480} class="w-full rounded" loading="eager" />
+				{bio.photoCaption && <figcaption class="mt-2 text-center text-sm text-muted italic">{bio.photoCaption}</figcaption>}
+			</figure>
+			<div data-bio class="intro-bio prose max-w-none [&_strong]:text-strong">
+				<Bio />
+			</div>
 		</div>
 
-		<h2 class="clear-both mt-10 mb-2 font-mono text-sm font-normal text-muted">recent posts</h2>
-		<ul data-recent>
-			{
-				recent.map((post) => (
-					<li class="flex flex-col gap-y-0.5 border-b border-dotted border-line py-2 sm:flex-row sm:flex-wrap sm:items-baseline sm:gap-x-3.5 sm:py-1.5">
-						<time datetime={post.data.date.toISOString()} class="min-w-24 font-mono text-xs text-muted">
-							{formatDate(post.data.date, 'iso')}
-						</time>
-						<a href={entryUrl('posts', post.id)} class="no-underline hover:underline">
-							{post.data.title}
-						</a>
-						<span class="sm:ml-auto">
-							<TagPills tags={post.data.tags} collection="posts" />
-						</span>
-					</li>
-				))
-			}
-		</ul>
+		{
+			recent.length > 0 && (
+				<>
+					<h2 class="mt-10 mb-2 font-mono text-sm font-normal text-muted">recent posts</h2>
+					<ul data-recent>
+						{recent.map((post) => (
+							<li class="flex flex-col gap-y-0.5 border-b border-dotted border-line py-2 sm:flex-row sm:flex-wrap sm:items-baseline sm:gap-x-3.5 sm:py-1.5">
+								<time datetime={post.data.date.toISOString()} class="min-w-24 font-mono text-xs text-muted">
+									{formatDate(post.data.date, 'iso')}
+								</time>
+								<a href={entryUrl('posts', post.id)} class="no-underline hover:underline">
+									{post.data.title}
+								</a>
+								<span class="sm:ml-auto">
+									<TagPills tags={post.data.tags} collection="posts" />
+								</span>
+							</li>
+						))}
+					</ul>
+				</>
+			)
+		}
 	</div>
 </BaseLayout>
+
+<style>
+	/*
+	  Phones: heading, then photo, then bio, one under the other.
+	  Wider screens: heading and bio in a column narrow enough to read comfortably (65 characters),
+	  with the photo and its caption beside them.
+	*/
+	.intro {
+		display: grid;
+		grid-template-areas: 'title' 'photo' 'bio';
+		gap: 1rem;
+	}
+	.intro-title {
+		grid-area: title;
+	}
+	.intro-photo {
+		grid-area: photo;
+		max-width: 12rem; /* keeps the tall portrait from filling a phone screen */
+	}
+	.intro-bio {
+		grid-area: bio;
+	}
+	@media (width >= 48rem) {
+		.intro {
+			grid-template-columns: minmax(0, 65ch) minmax(12rem, 18rem);
+			grid-template-areas:
+				'title photo'
+				'bio photo';
+			grid-template-rows: auto 1fr;
+			justify-content: space-between;
+			column-gap: 3rem;
+		}
+		.intro-photo {
+			max-width: none;
+		}
+	}
+</style>

@@ -36,3 +36,10 @@ test('a folder without a matching note gets a warning naming it', () => {
 test('a missing collection folder is just empty', () => {
 	expect(listEntries(vault(), 'projects')).toEqual([]);
 });
+
+test('draft: true is recognised even with a comment after it', () => {
+	const dir = mkdtempSync(join(tmpdir(), 'vault-'));
+	mkdirSync(join(dir, 'posts', 'd'), { recursive: true });
+	writeFileSync(join(dir, 'posts', 'd', 'd.md'), '---\ntitle: D\ndraft: true # not ready yet\n---\n');
+	expect(listEntries(dir, 'posts')).toEqual([{ folder: 'd', name: 'd', draft: true }]);
+});

@@ -4,7 +4,7 @@ import ProjectCard from '../../components/ProjectCard.astro';
 import TagFilter from '../../components/TagFilter.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getPublished } from '../../lib/collections';
-import { countTags } from '../../lib/tags';
+import { countTags } from '../../lib/tag-filter';
 
 const projects = await getPublished('projects');
 ---
@@ -13,7 +13,8 @@ const projects = await getPublished('projects');
 	<div data-page class="page py-8">
 		<h1 class="text-3xl font-semibold text-strong">Projects</h1>
 		<p class="mt-1 text-muted">Things I've made as a programmer, a 3D artist, and a guitarist.</p>
-		<TagFilter tags={countTags(projects.map((project) => project.data))} />
+		{projects.length === 0 && <p class="mt-4 text-muted">No projects yet.</p>}
+		{projects.length > 0 && <TagFilter tags={countTags(projects.map((project) => project.data))} />}
 		<div data-grid class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
 			{projects.map((project) => <ProjectCard id={project.id} {...project.data} />)}
 		</div>

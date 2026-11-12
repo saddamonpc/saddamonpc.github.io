@@ -25,7 +25,7 @@ export function listEntries(contentDir: string, collection: 'posts' | 'projects'
 			continue;
 		}
 		const head = readFileSync(join(dir, folder.name, note), 'utf8').split(/^---\s*$/m)[1] ?? '';
-		entries.push({ folder: folder.name, name: note.slice(0, -3), draft: /^draft:\s*true\s*$/m.test(head) });
+		entries.push({ folder: folder.name, name: note.slice(0, -3), draft: /^draft:\s*true\s*(#.*)?$/m.test(head) }); // "draft: true", optionally with a # comment
 	}
 	return entries;
 }

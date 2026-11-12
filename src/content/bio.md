@@ -1,3 +1,8 @@
+---
+# The short line under your photo on the home page.
+photoCaption: Why hello there!
+---
+
 <!-- The home page bio. Edit freely: it shows under "Hi! I'm Mohammad Saddam Mashuri." -->
 <!-- edited: the first sentence ("Hi! I'm Mohammad Saddam Mashuri.") is now the page heading, so it's not repeated here. -->
 

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { clearTags, initialState, matches, setMode, setMulti, stateFromQuery, stateToQuery, toggleTag } from '../../src/lib/tag-filter';
+import { clearTags, countTags, initialState, matches, setMode, setMulti, stateFromQuery, stateToQuery, toggleTag } from '../../src/lib/tag-filter';
 
 describe('single-tag mode (the default)', () => {
 	test('clicking a tag selects only that tag; clicking it again clears', () => {
@@ -51,4 +51,12 @@ describe('address bar (query string)', () => {
 	test('nothing selected means no query', () => {
 		expect(stateToQuery(initialState)).toBe('');
 	});
+});
+
+test('countTags: counts tags, most used first, ties alphabetical', () => {
+	expect(countTags([{ tags: ['b', 'a'] }, { tags: ['a'] }, { tags: ['c'] }])).toEqual([
+		{ tag: 'a', count: 2 },
+		{ tag: 'b', count: 1 },
+		{ tag: 'c', count: 1 },
+	]);
 });

@@ -183,9 +183,14 @@
 	color: var(--color-muted);
 }
 
-/* Callouts: note style by default, tip and warning families recoloured. */
+/*
+  Callouts (> [!tip], > [!note], > [!warning], ...). Three styles, each a colour plus an icon:
+  note (the default for any type), tip, and warning. To move a type to another style,
+  add or remove it in the lists below.
+*/
 .prose .callout {
 	--callout: var(--color-note);
+	--callout-icon: 'ⓘ';
 	border-left: 3px solid var(--callout);
 	background: color-mix(in srgb, var(--callout) 12%, transparent);
 	border-radius: 6px;
@@ -194,6 +199,7 @@
 }
 .prose .callout:is([data-callout='tip'], [data-callout='hint'], [data-callout='important'], [data-callout='success'], [data-callout='check'], [data-callout='done']) {
 	--callout: var(--color-accent);
+	--callout-icon: '✦';
 }
 .prose
 	.callout:is(
@@ -208,6 +214,7 @@
 		[data-callout='bug']
 	) {
 	--callout: var(--color-warn);
+	--callout-icon: '⚠';
 }
 .prose .callout-title {
 	display: flex;
@@ -217,29 +224,11 @@
 	font-weight: 600;
 	color: var(--callout);
 }
+.prose .callout-title::before {
+	content: var(--callout-icon);
+}
 .prose summary.callout-title {
 	cursor: pointer;
-}
-.prose .callout-title::before {
-	content: 'ⓘ';
-}
-.prose .callout:is([data-callout='tip'], [data-callout='hint'], [data-callout='important'], [data-callout='success'], [data-callout='check'], [data-callout='done']) .callout-title::before {
-	content: '✦';
-}
-.prose
-	.callout:is(
-		[data-callout='warning'],
-		[data-callout='caution'],
-		[data-callout='attention'],
-		[data-callout='danger'],
-		[data-callout='error'],
-		[data-callout='failure'],
-		[data-callout='fail'],
-		[data-callout='missing'],
-		[data-callout='bug']
-	)
-	.callout-title::before {
-	content: '⚠';
 }
 .prose .callout-content > :first-child {
 	margin-top: 0.25rem;

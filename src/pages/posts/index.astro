@@ -8,7 +8,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getPublished } from '../../lib/collections';
 import { formatDate } from '../../lib/dates';
 import { stripImages } from '../../lib/images';
-import { countTags } from '../../lib/tags';
+import { countTags } from '../../lib/tag-filter';
 
 const posts = await Promise.all(
 	(await getPublished('posts')).map(async (post) => {
@@ -23,7 +23,8 @@ const years = Map.groupBy(posts, ({ post }) => formatDate(post.data.date, 'year'
 <BaseLayout title="Posts" current="posts">
 	<div data-page class="page py-8">
 		<h1 class="text-3xl font-semibold text-strong">Posts</h1>
-		<TagFilter tags={countTags(posts.map(({ post }) => post.data))} />
+		{posts.length === 0 && <p class="mt-4 text-muted">No posts yet.</p>}
+		{posts.length > 0 && <TagFilter tags={countTags(posts.map(({ post }) => post.data))} />}
 		{
 			[...years].map(([year, entries]) => (
 				<section data-filter-group>
