@@ -52,6 +52,14 @@ def log(chord, clean, total=6):
     print(f"{chord}: {clean}/{total} strings clean")
 ```
 
+## Audio and video
+
+![[sample-take.WAV|Sample take · recorded 2026-11-02]]
+
+![[sample-clip.webm|A sample clip]]
+
+![](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
+
 ## Pictures
 
 ![A placeholder photo](./photo-1.jpg 'Standard Markdown caption')
@@ -69,12 +77,6 @@ def log(chord, clean, total=6):
 ![[photo-6.jpg]]
 
 ![[IMG_0001.JPG]]
-
-## Audio and video
-
-![[sample-take.WAV|Sample take · recorded 2026-11-02]]
-
-![](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
 
 That's everything.[^1]
 

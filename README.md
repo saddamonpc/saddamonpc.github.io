@@ -64,7 +64,9 @@ Projects work the same way in `src/content/projects/`, and can also have `catego
 - Links to other notes: `[[sample-project]]`, `[[sample-project|your own text]]`, `[[sample-project#A heading]]`.
 - Pictures: `![[photo.jpg]]`, `![[photo.jpg|caption]]`, or `![caption](./photo.jpg)`. The caption shows under the picture and is read aloud to people who can't see it, so add one where you can.
 - Audio: `![[take.mp3|Title · recorded 2026-10-18]]`, with the file in the same folder (mp3, m4a, wav, ogg).
+- Video: `![[clip.mp4|Caption]]`, with the file in the same folder (mp4, webm, mov, m4v). Keep each file well under 100 MB (GitHub's limit); mp4 plays everywhere.
 - YouTube: `![](https://www.youtube.com/watch?v=...)`.
+- Videos and YouTube links also appear in the picture strip on the posts page, with a play badge.
 
 ### What doesn't (yet)
 

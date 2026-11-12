@@ -1,7 +1,7 @@
 // Works out three things about each post while the site builds, and hands them to the page
 // (in Astro: `const { remarkPluginFrontmatter } = await render(post)`):
 //   excerpt         the preview text on the posts page: the post's own paragraphs, cut to ~300 characters
-//   images          every local picture in the post, in order, for the picture strip
+//   media           every local picture, video and YouTube link in the post, in order, for the picture strip
 //   readingMinutes  "N min read", from the remark-reading-time package
 // The preview and picture list are hand-written: no package found that picks only real paragraphs.
 import type { Nodes, Root } from 'mdast';
@@ -9,6 +9,13 @@ import { visit } from 'unist-util-visit';
 import type { VFile } from 'vfile';
 
 const ABSOLUTE = /^(\/|[a-z][a-z0-9+.-]*:)/i; // /path, https:, data:, ...
+
+/** One thing in the picture strip. `src` is a path beside the post ("./photo.jpg"), a video's address, or a YouTube video id. */
+export interface MediaRef {
+	kind: 'image' | 'video' | 'youtube';
+	src: string;
+	alt: string;
+}
 
 /** Cuts text to at most `max` characters, at a space when possible, and adds "…" if anything was cut. */
 export function makeExcerpt(text: string, max = 300): string {
@@ -24,9 +31,12 @@ export function remarkPostMeta() {
 		const paragraphs = tree.children.filter((node) => node.type === 'paragraph');
 		const text = paragraphs.map(plainText).join(' ').replace(/\s+/g, ' ').trim();
 
-		const images: { url: string; alt: string }[] = [];
-		visit(tree, 'image', (node) => {
-			if (!ABSOLUTE.test(node.url)) images.push({ url: node.url, alt: node.alt ?? '' });
+		// Pictures are image nodes; videos are HTML that remark-obsidian marked with `media`.
+		const media: MediaRef[] = [];
+		visit(tree, (node) => {
+			if (node.type === 'image' && !ABSOLUTE.test(node.url)) media.push({ kind: 'image', src: node.url, alt: node.alt ?? '' });
+			const video = node.type === 'html' && (node.data as { media?: MediaRef } | undefined)?.media;
+			if (video) media.push(video);
 		});
 
 		// Set by the remark-reading-time package, which must run before this plugin.
@@ -35,7 +45,7 @@ export function remarkPostMeta() {
 		data.astro.frontmatter ??= {};
 		Object.assign(data.astro.frontmatter, {
 			excerpt: makeExcerpt(text),
-			images,
+			media,
 			readingMinutes: Math.max(1, Math.round(data.readingTime?.minutes ?? 0)),
 		});
 	};

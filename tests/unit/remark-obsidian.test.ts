@@ -73,6 +73,20 @@ describe('embeds', () => {
 		expect(html).not.toContain('<img');
 		expect(render('![My video](https://www.youtube.com/watch?v=xyz789&t=4)')).toContain('embed/xyz789" title="My video"');
 	});
+
+	test('a video file becomes a player at the top level, with its caption below', () => {
+		const html = render('![[my clip.mp4|A clip]]');
+		expect(html).toMatch(/^<figure class="clip">/);
+		expect(html).toContain('<video controls playsinline preload="metadata" src="./my%20clip.mp4#t=0.1"></video>');
+		expect(html).toContain('<figcaption>A clip</figcaption>');
+		expect(html).not.toContain('<p>');
+	});
+
+	test('a video without a caption has no caption; Markdown links to video files work too', () => {
+		expect(render('![[clip.MOV]]')).not.toContain('figcaption');
+		expect(render('![Take two](./clip.webm)')).toContain('src="./clip.webm#t=0.1"');
+		expect(render('![Take two](./clip.webm)')).not.toContain('<img');
+	});
 });
 
 describe('callouts', () => {

@@ -37,7 +37,15 @@ test('Obsidian extras render', async ({ page }) => {
 	await expect(page.locator('.wikilink-missing')).toHaveText('does-not-exist');
 	await expect(page.locator('main')).not.toContainText('hidden comment');
 	await expect(page.locator('iframe[src^="https://www.youtube-nocookie.com/embed/"]')).toHaveAttribute('title', /.+/);
-	await expect(page.locator('.prose figure:not(.frame) figcaption').first()).toHaveText('A placeholder photo'); // .frame figures are code blocks
+	await expect(page.locator('.prose figure:has(img) figcaption').first()).toHaveText('A placeholder photo');
+});
+
+test('a video file beside the post plays in a player, with its caption', async ({ page }) => {
+	await page.goto(URL);
+	const clip = page.locator('.prose figure.clip');
+	await expect(clip.locator('video')).toHaveAttribute('controls', '');
+	await expect(clip.locator('figcaption')).toHaveText('A sample clip');
+	expect((await page.request.get(`${URL}sample-clip.webm`)).status()).toBe(200);
 });
 
 test('callouts use the three styles, unknown types fall back to note', async ({ page }) => {

@@ -47,9 +47,17 @@ describe('remarkPostMeta', () => {
 	});
 
 	test('lists local pictures in order, skipping web addresses', () => {
-		expect(meta('![x](./a.jpg)\n\n![[b c.png|cap]]\n\n![r](https://x.y/r.png)').images).toEqual([
-			{ url: './a.jpg', alt: 'x' },
-			{ url: './b c.png', alt: 'cap' },
+		expect(meta('![x](./a.jpg)\n\n![[b c.png|cap]]\n\n![r](https://x.y/r.png)').media).toEqual([
+			{ kind: 'image', src: './a.jpg', alt: 'x' },
+			{ kind: 'image', src: './b c.png', alt: 'cap' },
+		]);
+	});
+
+	test('lists videos and YouTube links among the pictures, in order', () => {
+		expect(meta('![[a.jpg]]\n\n![[clip.mp4|Take]]\n\n![Song](https://youtu.be/abc123)').media).toEqual([
+			{ kind: 'image', src: './a.jpg', alt: '' },
+			{ kind: 'video', src: './clip.mp4', alt: 'Take' },
+			{ kind: 'youtube', src: 'abc123', alt: 'Song' },
 		]);
 	});
 

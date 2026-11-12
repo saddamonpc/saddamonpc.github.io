@@ -2,6 +2,7 @@
 //   %%comments%%          removed
 //   ![[photo.jpg|text]]   picture (text becomes its description/caption)
 //   ![[take.mp3|title]]   audio player box
+//   ![[clip.mp4|text]]    video player (text becomes its caption); ![text](./clip.mp4) works too
 //   [[note|text]]         link to another post or project (or plain text if it doesn't exist)
 //   ![](youtube link)     YouTube video (privacy-friendly embed)
 // (==highlights== come from the remark-flexible-markers package and callouts from rehype-callouts.)
@@ -14,6 +15,7 @@ import type { Html, Image, Link, Parent, PhrasingContent, Root, Text } from 'mda
 import type { Node } from 'unist';
 import { SKIP, visit } from 'unist-util-visit';
 import type { VFile } from 'vfile';
+import type { MediaRef } from './remark-post-meta';
 
 export interface ObsidianOptions {
 	/** Returns the page address for a note name, or null if there's no such note. */
@@ -22,6 +24,7 @@ export interface ObsidianOptions {
 
 const IMAGE = /\.(png|jpe?g|webp|avif|gif|svg)$/i;
 const AUDIO = /\.(mp3|m4a|wav|ogg)$/i;
+const VIDEO = /\.(mp4|webm|mov|m4v)$/i;
 const OBSIDIAN_SIZE = /^\d+(x\d+)?$/; // ![[photo.jpg|300]] sets a size in Obsidian; ignored here
 const WIKI = /(!?)\[\[([^\]\n]+?)\]\]/g;
 
@@ -41,7 +44,9 @@ export function remarkObsidian({ resolveLink }: ObsidianOptions) {
 		visit(tree, 'image', (node, index, parent) => {
 			if (!parent || index === undefined) return;
 			const id = youTubeId(node.url);
-			if (id) parent.children[index] = blockHtml(youTubeEmbed(id, node.alt ?? ''));
+			const alt = node.alt ?? '';
+			if (id) parent.children[index] = blockHtml(youTubeEmbed(id, alt), { kind: 'youtube', src: id, alt });
+			else if (VIDEO.test(node.url)) parent.children[index] = videoEmbed(node.url, alt);
 		});
 
 		// Audio players and videos are blocks: lift them out of the paragraph they were written in.
@@ -136,6 +141,7 @@ function embed(target: string, resolveLink: ObsidianOptions['resolveLink'], file
 				`<audio controls preload="none" src="./${encodeURI(name)}"></audio></figure>`,
 		);
 	}
+	if (VIDEO.test(name)) return videoEmbed(`./${name}`, extra);
 	// Embedding a whole note isn't supported: link to it instead.
 	return wikilink(target, resolveLink, file);
 }
@@ -178,10 +184,18 @@ function youTubeEmbed(id: string, title: string): string {
 	);
 }
 
+function videoEmbed(src: string, caption: string): Html {
+	// "#t=0.1" makes phones (iPhones especially) show the first frame instead of a black box.
+	const video = `<video controls playsinline preload="metadata" src="${encodeURI(src)}#t=0.1"></video>`;
+	const figcaption = caption ? `<figcaption>${escapeHtml(caption)}</figcaption>` : '';
+	return blockHtml(`<figure class="clip">${video}${figcaption}</figure>`, { kind: 'video', src, alt: caption });
+}
+
 // Obsidian writes [[posts/foo/note]] when a name isn't unique in the vault.
 const lastSegment = (path: string) => path.split('/').pop() ?? path;
 const text = (value: string): Text => ({ type: 'text', value });
-const blockHtml = (value: string): Html => ({ type: 'html', value, data: { block: true } as Html['data'] });
+// A block of HTML. `media` adds a video to the posts page's picture strip (remark-post-meta collects it).
+const blockHtml = (value: string, media?: MediaRef): Html => ({ type: 'html', value, data: { block: true, media } as Html['data'] });
 const splitPipe = (target: string): [string, string] => {
 	const at = target.indexOf('|');
 	return at === -1 ? [target.trim(), ''] : [target.slice(0, at).trim(), target.slice(at + 1).trim()];

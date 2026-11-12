@@ -1,38 +1,73 @@
 ---
-// A row of tiny thumbnails of a post's pictures, under its title on the posts page.
-// Hover (or keyboard focus) shows a bigger preview; click / Enter / tap opens the viewer (PictureViewer).
-import type { StripImage } from '../lib/images';
+// A row of tiny thumbnails of a post's pictures and videos, under its title on the posts page.
+// Hover (or keyboard focus) shows a bigger preview; a video file plays there, silently.
+// Click / Enter / tap opens the viewer (PictureViewer). Videos get a small play badge.
+import type { StripItem } from '../lib/images';
 
 interface Props {
-	images: StripImage[];
+	media: StripItem[];
 	postTitle: string;
 	postUrl: string;
 }
 
 const MAX_THUMBS = 6;
-const { images, postTitle, postUrl } = Astro.props;
-const strip = JSON.stringify({ title: postTitle, url: postUrl, images });
+const { media, postTitle, postUrl } = Astro.props;
+const strip = JSON.stringify({ title: postTitle, url: postUrl, media });
 ---
 
 {
-	images.length > 0 && (
+	media.length > 0 && (
 		<div class="thumbs mt-1.5 flex flex-wrap items-center gap-1.5" data-strip={strip}>
-			{images.slice(0, MAX_THUMBS).map((img, i) => (
-				<button type="button" class="thumb" data-index={i} aria-label={`View picture ${i + 1} of ${images.length}: ${img.caption}`}>
-					<img src={img.thumb} alt="" loading="lazy" decoding="async" />
+			{media.slice(0, MAX_THUMBS).map((item, i) => (
+				<button
+					type="button"
+					class="thumb"
+					data-index={i}
+					data-kind={item.kind}
+					aria-label={`${item.kind === 'image' ? 'View picture' : 'Play video'} ${i + 1} of ${media.length}: ${item.caption}`}
+				>
+					{item.kind === 'video' ? (
+						<video src={`${item.thumb}#t=0.1`} muted playsinline preload="metadata" />
+					) : (
+						<img src={item.thumb} alt="" loading="lazy" decoding="async" />
+					)}
+					{item.kind !== 'image' && <span class="play" />}
 					<span class="pop">
-						<img src={img.preview} alt="" loading="lazy" decoding="async" />
+						{item.kind === 'video' ? (
+							<video src={`${item.preview}#t=0.1`} muted loop playsinline preload="none" />
+						) : (
+							<img src={item.preview} alt="" loading="lazy" decoding="async" />
+						)}
+						{item.kind === 'youtube' && <span class="play" />}
 					</span>
 				</button>
 			))}
-			{images.length > MAX_THUMBS && (
-				<button type="button" class="more" data-index={MAX_THUMBS} aria-label={`View ${images.length - MAX_THUMBS} more pictures`}>
-					+{images.length - MAX_THUMBS}
+			{media.length > MAX_THUMBS && (
+				<button type="button" class="more" data-index={MAX_THUMBS} aria-label={`View ${media.length - MAX_THUMBS} more pictures and videos`}>
+					+{media.length - MAX_THUMBS}
 				</button>
 			)}
 		</div>
 	)
 }
+
+<script>
+	// Hovering (or focusing) a video's thumbnail plays it silently in the bigger preview, like YouTube's home page.
+	// With "reduce motion" turned on, the preview shows a still frame instead.
+	const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+	for (const thumb of document.querySelectorAll<HTMLElement>('.thumb[data-kind="video"]')) {
+		const video = thumb.querySelector<HTMLVideoElement>('.pop video')!;
+		const start = () => {
+			if (reduceMotion.matches) video.preload = 'metadata'; // loads the first frame
+			else video.play().catch(() => {}); // fails harmlessly if stopped again before it started
+		};
+		const stop = () => video.pause();
+		thumb.addEventListener('mouseenter', start);
+		thumb.addEventListener('focus', start);
+		thumb.addEventListener('mouseleave', stop);
+		thumb.addEventListener('blur', stop);
+	}
+</script>
 
 <style>
 	.thumb {
@@ -43,14 +78,40 @@ const strip = JSON.stringify({ title: postTitle, url: postUrl, images });
 		border: 1px solid var(--color-line);
 		border-radius: 3px;
 	}
+	.thumb:not([data-kind='image']) {
+		cursor: pointer;
+	}
 	.thumb:hover {
 		border-color: var(--color-accent);
 	}
-	.thumb > img {
+	.thumb > img,
+	.thumb > video {
 		width: 44px;
 		height: 30px;
 		object-fit: cover;
 		border-radius: 2px;
+	}
+	/* Play badge: a white triangle in a dark circle, in the middle of a video's thumbnail. */
+	.play {
+		position: absolute;
+		inset: 0;
+		width: 16px;
+		height: 16px;
+		margin: auto;
+		border-radius: 50%;
+		background: #000a;
+		pointer-events: none;
+	}
+	.play::after {
+		content: '';
+		position: absolute;
+		inset: 28% 22% 28% 36%;
+		background: #fff;
+		clip-path: polygon(0 0, 100% 50%, 0 100%);
+	}
+	.pop .play {
+		width: 48px;
+		height: 48px;
 	}
 	.more {
 		height: 32px;
@@ -77,11 +138,16 @@ const strip = JSON.stringify({ title: postTitle, url: postUrl, images });
 		box-shadow: 0 8px 24px #000a;
 		pointer-events: none;
 	}
-	.pop img {
+	.pop img,
+	.pop video {
 		width: 260px;
 		max-width: none;
 		height: auto;
 		border-radius: 3px;
+	}
+	.pop video {
+		aspect-ratio: 16 / 9;
+		background: #000;
 	}
 	@media (hover: hover) {
 		.thumb:hover .pop,
@@ -91,7 +157,8 @@ const strip = JSON.stringify({ title: postTitle, url: postUrl, images });
 	}
 	/* Bigger targets for fingers. */
 	@media (hover: none) {
-		.thumb > img {
+		.thumb > img,
+		.thumb > video {
 			width: 52px;
 			height: 38px;
 		}

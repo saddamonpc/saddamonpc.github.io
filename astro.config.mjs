@@ -49,6 +49,9 @@ export default defineConfig({
 		}),
 	},
 
+	// YouTube's still pictures for the posts page's picture strip are downloaded at build time and shrunk.
+	image: { domains: ['i.ytimg.com'] },
+
 	// Fonts are downloaded at build time and served from this site (no requests to Google at runtime).
 	fonts: [
 		{
@@ -74,12 +77,13 @@ export default defineConfig({
 	vite: {
 		plugins: [
 			tailwindcss(),
-			// Audio files sit next to their post (src/content/posts/<folder>/take.mp3).
+			// Audio and video files sit next to their post (src/content/posts/<folder>/take.mp3).
 			// Copy them to the same address as the post (/posts/<folder>/take.mp3), and serve them in dev too.
 			viteStaticCopy({
-				silent: true, // fine if a folder has no audio yet
+				silent: true, // fine if a folder has no audio or video yet
 				targets: ['posts', 'projects'].map((collection) => ({
-					src: `src/content/${collection}/*/*.{mp3,m4a,wav,ogg,MP3,M4A,WAV,OGG}`, // phones often write .MP3
+					// Phones often write capitals (.MP3, .MOV)
+					src: `src/content/${collection}/*/*.{mp3,m4a,wav,ogg,mp4,webm,mov,m4v,MP3,M4A,WAV,OGG,MP4,WEBM,MOV,M4V}`,
 					dest: collection,
 					rename: { stripBase: 3 },
 				})),

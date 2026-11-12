@@ -1,21 +1,44 @@
 ---
-// Full-size picture viewer for the picture strips, using the PhotoSwipe library.
+// Full-size viewer for the picture strips, using the PhotoSwipe library.
 // PhotoSwipe handles ← → to flip, Esc to close, swiping on phones, and putting focus back where it was.
+// Its video plugin plays video files (and pauses them when you flip away); YouTube videos get YouTube's player.
 ---
 
 <script>
 	import PhotoSwipeLightbox from 'photoswipe/lightbox';
+	import PhotoSwipeVideoPlugin from 'photoswipe-video-plugin';
 	import 'photoswipe/style.css';
-	import type { StripImage } from '../lib/images';
+	import type { StripItem } from '../lib/images';
 
-	type Strip = { title: string; url: string; images: StripImage[] };
+	type Strip = { title: string; url: string; media: StripItem[] };
 	let current: Strip | undefined;
+
+	// The video plugin waits for a poster picture before showing a video. There is none, so give it an empty one.
+	const NO_POSTER = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+	const ROOM_FOR_BARS = 100; // keeps a video's controls clear of the top bar and the caption
 
 	const lightbox = new PhotoSwipeLightbox({
 		pswpModule: () => import('photoswipe'),
 		bgOpacity: 0.92,
 		showHideAnimationType: 'fade',
 	});
+	new PhotoSwipeVideoPlugin(lightbox, {});
+
+	// Flipping away from a YouTube video stops it (reloading its player is the only way without YouTube's own script).
+	lightbox.on('contentDeactivate', ({ content }) => {
+		const player = content.element?.querySelector('iframe');
+		if (player) player.src = player.src;
+	});
+
+	function slide(item: StripItem) {
+		if (item.kind === 'image') return { src: item.full, width: item.width, height: item.height, alt: item.caption };
+		if (item.kind === 'video') {
+			// Fill the screen: the video keeps its own shape inside, whether it was filmed upright or sideways.
+			return { type: 'video', videoSrc: item.full, msrc: NO_POSTER, width: innerWidth, height: innerHeight - ROOM_FOR_BARS };
+		}
+		const title = item.caption.replaceAll('&', '&amp;').replaceAll('"', '&quot;');
+		return { html: `<div class="pswp-youtube"><iframe src="${item.full}" title="${title}" allowfullscreen></iframe></div>` };
+	}
 
 	lightbox.on('uiRegister', () => {
 		// The caption and which post it's from, under the picture
@@ -27,8 +50,8 @@
 			onInit: (el, pswp) => {
 				el.className = 'pswp-caption';
 				pswp.on('change', () => {
-					const image = current?.images[pswp.currIndex];
-					el.textContent = image ? `${image.caption}, from “${current?.title}”` : '';
+					const item = current?.media[pswp.currIndex];
+					el.textContent = item ? `${item.caption}, from “${current?.title}”` : '';
 				});
 			},
 		});
@@ -52,8 +75,7 @@
 		const button = (event.target as HTMLElement).closest<HTMLElement>('[data-strip] [data-index]');
 		if (!button) return;
 		current = JSON.parse(button.closest<HTMLElement>('[data-strip]')!.dataset.strip!) as Strip;
-		const slides = current.images.map((img) => ({ src: img.full, width: img.width, height: img.height, alt: img.caption }));
-		lightbox.loadAndOpen(Number(button.dataset.index), slides);
+		lightbox.loadAndOpen(Number(button.dataset.index), current.media.map(slide));
 	});
 </script>
 
@@ -79,5 +101,22 @@
 	}
 	.pswp__counter {
 		font-family: var(--font-mono);
+	}
+	/* Tailwind's "max-width: 100%" on videos would squash them to nothing inside PhotoSwipe's zero-width wrapper. */
+	.pswp video {
+		max-width: none;
+	}
+	/* A YouTube player as big as fits between the top bar and the caption, in its 16:9 shape. */
+	.pswp-youtube {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: 100%;
+	}
+	.pswp-youtube iframe {
+		width: min(100%, calc((100vh - 100px) * 16 / 9));
+		aspect-ratio: 16 / 9;
+		border: 0;
+		background: #000;
 	}
 </style>
