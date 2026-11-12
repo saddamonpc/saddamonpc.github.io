@@ -164,3 +164,14 @@ test('highlights use the pistachio-to-mint gradient; plain links do not', async 
 	await page.locator('.prose a.wikilink').first().hover();
 	expect(await gradient('.prose a.wikilink')).toBe('none');
 });
+
+test('only the fonts every page uses straight away are preloaded', async ({ page }) => {
+	// Preloading fonts a page never uses makes browsers warn ("preloaded but not used").
+	for (const path of ['/', '/posts/', '/cv/']) {
+		await page.goto(path);
+		const preloads = await page.locator('link[rel="preload"][as="font"]').evaluateAll((links) => links.map((l) => l.getAttribute('href')));
+		expect(preloads, path).toHaveLength(3); // Lora regular, Lora semibold, Noto Sans Mono regular (Latin)
+		const used = await page.evaluate(() => performance.getEntriesByType('resource').filter((e) => e.name.includes('/_astro/fonts/')).map((e) => new URL(e.name).pathname));
+		for (const href of preloads) expect(used, `${path} uses ${href}`).toContain(href);
+	}
+});

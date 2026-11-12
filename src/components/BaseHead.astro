@@ -24,8 +24,9 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 <link rel="alternate" type="application/rss+xml" title={SITE_TITLE} href={new URL('rss.xml', Astro.site)} />
 <meta name="generator" content={Astro.generator} />
 
-<Font cssVariable="--font-lora" preload />
-<Font cssVariable="--font-noto-sans-mono" preload />
+<!-- Preload only the font files every page uses straight away (Latin). The rest load when a page needs them. -->
+<Font cssVariable="--font-lora" preload={[{ subset: 'latin', style: 'normal', weight: 400 }, { subset: 'latin', style: 'normal', weight: 600 }]} />
+<Font cssVariable="--font-noto-sans-mono" preload={[{ subset: 'latin', style: 'normal', weight: 400 }]} />
 
 <link rel="canonical" href={canonicalURL} />
 <title>{title}</title>
