@@ -133,7 +133,7 @@ test('footer has the four links and the copyright line', async ({ page }) => {
 	await expect(footerNav.getByRole('link')).toHaveText(['email', 'github', 'linkedin', 'rss']);
 	await expect(footerNav.getByRole('link', { name: 'email' })).toHaveAttribute('href', 'mailto:saddamonpc@gmail.com');
 	await expect(footerNav.getByRole('link', { name: 'rss' })).toHaveAttribute('href', '/rss.xml');
-	await expect(page.locator('footer')).toContainText(/© \d{4} Mohammad Saddam Mashuri · last updated \d{4}-\d{2}-\d{2}/);
+	await expect(page.locator('footer')).toContainText(/© \d{4} Mohammad Saddam Mashuri\. Last updated \d{1,2} [A-Z][a-z]+ \d{4}\./);
 });
 
 test('page content lines up with the navbar on every page', async ({ page }) => {

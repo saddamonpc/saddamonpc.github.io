@@ -1,10 +1,11 @@
 ---
 import { FULL_NAME, SOCIALS } from '../consts';
+import { formatDate } from '../lib/dates';
 
 // The build date, in UTC, so it doesn't depend on which computer builds the site.
 const built = new Date();
 const year = built.getUTCFullYear();
-const updated = built.toISOString().slice(0, 10);
+const updated = formatDate(built, 'long');
 
 const links = [
 	{ label: 'email', href: SOCIALS.email },
@@ -29,6 +30,6 @@ const links = [
 				}
 			</ul>
 		</nav>
-		<p>© {year} {FULL_NAME} · last updated {updated}</p>
+		<p>© {year} {FULL_NAME}. Last updated {updated}.</p>
 	</div>
 </footer>

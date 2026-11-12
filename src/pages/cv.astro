@@ -4,6 +4,7 @@ import { Icon } from 'astro-icon/components';
 import CvEntry from '../components/CvEntry.astro';
 import DownloadButton from '../components/DownloadButton.astro';
 import { cv } from '../data/cv';
+import { formatDate } from '../lib/dates';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const sectionTitle = 'mt-8 mb-3 border-b border-line pb-1 text-xl font-semibold text-strong';
@@ -35,7 +36,7 @@ const rail = 'ml-1.5 border-l border-line pl-5';
 				<DownloadButton label="Download résumé" href={cv.pdf.resume} />
 			</div>
 		</div>
-		<p class="mt-2 font-mono text-xs text-muted">last updated {cv.updated}</p>
+		<p class="mt-2 text-sm text-muted">Last updated on {formatDate(new Date(cv.updated), 'long')}.</p>
 
 		<h2 class={sectionTitle}>About</h2>
 		<p>{cv.about}</p>

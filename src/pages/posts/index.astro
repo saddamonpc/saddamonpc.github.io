@@ -28,7 +28,7 @@ const years = Map.groupBy(posts, ({ post }) => formatDate(post.data.date, 'year'
 		{
 			[...years].map(([year, entries]) => (
 				<section data-filter-group>
-					<h2 class="mt-6 mb-1 font-mono text-sm font-normal text-muted">{year}</h2>
+					<h2 class="mt-8 mb-1 text-xl font-semibold text-strong">{year}</h2>
 					{entries.map(({ post, excerpt, images }) => (
 						<PostRow id={post.id} title={post.data.title} date={post.data.date} tags={post.data.tags} excerpt={excerpt} images={images} />
 					))}

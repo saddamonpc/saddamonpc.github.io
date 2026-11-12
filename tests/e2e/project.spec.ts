@@ -20,6 +20,12 @@ test('project page has a table of contents on wide screens', async ({ page }) =>
 	await expect(page.locator('nav[aria-label="Table of contents"]')).toBeVisible();
 });
 
+test('no "last updated" when a project has no updated date', async ({ page }) => {
+	await page.goto('/projects/sample-project/');
+	await expect(page.locator('[data-entry-meta]')).toContainText('Created on 1 October 2026.');
+	await expect(page.locator('[data-entry-meta]')).not.toContainText('last updated');
+});
+
 test('posts have no facts strip', async ({ page }) => {
 	await page.goto('/posts/sample-post/');
 	await expect(page.locator('[data-facts]')).toHaveCount(0);

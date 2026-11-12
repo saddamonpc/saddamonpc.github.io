@@ -39,5 +39,5 @@ for (const [collection, empty] of [
 
 test('home only shows "recent posts" when there are posts', () => {
 	const html = page('');
-	expect(html.includes('recent posts'), 'recent posts section').toBe(published('posts') > 0);
+	expect(html.includes('Recent posts'), 'recent posts section').toBe(published('posts') > 0);
 });

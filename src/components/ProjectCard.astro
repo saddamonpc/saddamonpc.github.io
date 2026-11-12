@@ -29,7 +29,7 @@ const { id, title, date, tags, cover } = Astro.props;
 		}
 		<div class="px-3 pt-2">
 			<b class="block leading-snug font-semibold text-strong">{title}</b>
-			<span class="font-mono text-xs text-muted">{formatDate(date, 'year')}</span>
+			<span class="text-sm text-muted">{formatDate(date, 'year')}</span>
 		</div>
 	</a>
 	<div class="px-3 pt-1 pb-3">

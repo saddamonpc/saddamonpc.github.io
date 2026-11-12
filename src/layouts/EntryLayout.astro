@@ -5,7 +5,7 @@ import { Image } from 'astro:assets';
 import TableOfContents from '../components/TableOfContents.astro';
 import TagPills from '../components/TagPills.astro';
 import type { CollectionName } from '../lib/content';
-import { formatDate } from '../lib/dates';
+import { formatDate, readingTime } from '../lib/dates';
 import '../styles/prose.css';
 import BaseLayout from './BaseLayout.astro';
 
@@ -13,6 +13,7 @@ interface Props {
 	collection: CollectionName;
 	title: string;
 	date: Date;
+	updated?: Date;
 	tags: string[];
 	cover?: ImageMetadata;
 	headings: MarkdownHeading[];
@@ -21,7 +22,7 @@ interface Props {
 	facts?: { category?: string; tools?: string[]; timeframe?: string };
 }
 
-const { collection, title, date, tags, cover, headings, readingMinutes, description, facts = {} } = Astro.props;
+const { collection, title, date, updated, tags, cover, headings, readingMinutes, description, facts = {} } = Astro.props;
 
 // Project facts strip (category, tools, timeframe). Only the ones that are filled in are shown.
 const factRows = [
@@ -43,13 +44,16 @@ const factRows = [
 		<div data-page class="page lg:grid lg:grid-cols-[minmax(0,1fr)_13rem] lg:gap-x-12">
 			<header class:list={['lg:col-start-1', cover ? 'relative -mt-12' : 'pt-10']}>
 				<h1 class="mb-2 text-3xl leading-tight font-semibold text-strong sm:text-4xl">{title}</h1>
-				<div data-entry-meta class="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs text-muted">
-					<span>{formatDate(date, 'iso')} · {readingMinutes} min read</span>
-					<TagPills tags={tags} collection={collection} />
+				<div data-entry-meta class="text-sm text-muted">
+					<p>
+						Created on {formatDate(date, 'long')}{updated && <>, last updated on {formatDate(updated, 'long')}</>}.
+					</p>
+					<p>{readingTime(readingMinutes)}</p>
+					<div class="mt-2"><TagPills tags={tags} collection={collection} /></div>
 				</div>
 				{
 					factRows.length > 0 && (
-						<dl data-facts class="mt-4 flex flex-wrap gap-x-6 gap-y-1 border-y border-dashed border-line py-2 font-mono text-xs text-muted">
+						<dl data-facts class="mt-4 flex flex-wrap gap-x-6 gap-y-1 border-y border-dashed border-line py-2 text-sm text-muted">
 							{factRows.map((row) => (
 								<div class="flex gap-2">
 									<dt class="font-semibold text-fg">{row.label}</dt>

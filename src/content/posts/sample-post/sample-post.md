@@ -1,6 +1,7 @@
 ---
 title: 'Sample post: everything this site can render'
 date: 2026-11-02
+updated: 2026-11-12
 draft: true # never published: shows only in `npm run dev` and in the tests
 tags: [Guitar, practice, 3D]
 cover: ./cover.jpg

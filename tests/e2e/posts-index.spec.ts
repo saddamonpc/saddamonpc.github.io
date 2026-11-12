@@ -50,7 +50,7 @@ test('viewer: keyboard opens it, arrows flip, Esc closes and returns focus', asy
 	await page.keyboard.press('ArrowLeft');
 	await page.keyboard.press('ArrowLeft');
 	await expect(counter).toHaveText('9 / 9');
-	await expect(page.locator('.pswp').getByRole('link', { name: 'open post →' })).toHaveAttribute('href', '/posts/sample-post/');
+	await expect(page.locator('.pswp').getByRole('link', { name: 'Open the post ->' })).toHaveAttribute('href', '/posts/sample-post/');
 	await page.keyboard.press('Escape');
 	await expect(page.locator('.pswp')).toHaveCount(0);
 	await expect(first).toBeFocused();

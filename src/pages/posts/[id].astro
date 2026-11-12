@@ -17,6 +17,7 @@ const { Content, headings, remarkPluginFrontmatter } = await render(post);
 	collection="posts"
 	title={post.data.title}
 	date={post.data.date}
+	updated={post.data.updated}
 	tags={post.data.tags}
 	cover={post.data.cover}
 	headings={headings}

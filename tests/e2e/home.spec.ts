@@ -36,14 +36,14 @@ test('links in the bio work', async ({ page, request }) => {
 
 test('recent posts', async ({ page }) => {
 	await page.goto('/');
-	await expect(page.getByText('recent posts', { exact: true })).toBeVisible();
+	await expect(page.getByRole('heading', { name: 'Recent posts' })).toBeVisible();
 	const rows = page.locator('[data-recent] > li');
 	expect(await rows.count()).toBeLessThanOrEqual(3);
 	// Newest first: the newer test post comes before the sample.
 	await expect(rows.first()).toContainText('Test: a newer post');
 	const row = rows.filter({ hasText: 'Sample post' });
 	await expect(row.getByRole('link').first()).toHaveAttribute('href', '/posts/sample-post/');
-	await expect(row).toContainText('2026-11-02');
+	await expect(row).toContainText('2 Nov 2026');
 });
 
 test.describe('phone', () => {

@@ -29,7 +29,7 @@ export interface Cv {
 
 export const cv: Cv = {
 	name: 'Mohammad Saddam Mashuri',
-	role: 'Backend Developer · 3D hobbyist · guitarist',
+	role: 'Backend developer, 3D hobbyist and guitarist.',
 	updated: '2026-11-11',
 	links: [
 		{ icon: 'mdi:email-outline', text: 'saddamonpc@gmail.com', href: 'mailto:saddamonpc@gmail.com' },

@@ -18,7 +18,7 @@
 	});
 
 	lightbox.on('uiRegister', () => {
-		// "caption · post title" under the picture
+		// The caption and which post it's from, under the picture
 		lightbox.pswp?.ui?.registerElement({
 			name: 'caption',
 			order: 9,
@@ -28,11 +28,11 @@
 				el.className = 'pswp-caption';
 				pswp.on('change', () => {
 					const image = current?.images[pswp.currIndex];
-					el.textContent = image ? `${image.caption} · ${current?.title}` : '';
+					el.textContent = image ? `${image.caption}, from “${current?.title}”` : '';
 				});
 			},
 		});
-		// "open post →" link
+		// "Open the post ->" link
 		lightbox.pswp?.ui?.registerElement({
 			name: 'open-post',
 			order: 8,
@@ -41,7 +41,7 @@
 			appendTo: 'bar',
 			onInit: (el) => {
 				el.className = 'pswp-open-post';
-				el.textContent = 'open post →';
+				el.textContent = 'Open the post ->';
 				el.setAttribute('href', current?.url ?? '/posts/');
 			},
 		});

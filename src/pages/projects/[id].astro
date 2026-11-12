@@ -11,13 +11,14 @@ export async function getStaticPaths() {
 
 const { project } = Astro.props;
 const { Content, headings, remarkPluginFrontmatter } = await render(project);
-const { title, date, tags, cover, category, tools, timeframe } = project.data;
+const { title, date, updated, tags, cover, category, tools, timeframe } = project.data;
 ---
 
 <EntryLayout
 	collection="projects"
 	title={title}
 	date={date}
+	updated={updated}
 	tags={tags}
 	cover={cover}
 	headings={headings}

@@ -15,7 +15,7 @@ const { tags, collection } = Astro.props;
 		<ul class="inline-flex flex-wrap gap-1">
 			{tags.map((tag) => (
 				<li>
-					<a href={tagUrl(collection, tag)} class="rounded-full bg-accent/12 px-2 py-px font-mono text-xs text-accent no-underline hover:bg-accent/25">
+					<a href={tagUrl(collection, tag)} class="tag-pill rounded-full px-2 py-px text-sm text-note italic no-underline">
 						#{tag}
 					</a>
 				</li>
@@ -23,3 +23,21 @@ const { tags, collection } = Astro.props;
 		</ul>
 	)
 }
+
+<style>
+	/* Lavender fading into mint, a little stronger on hover. */
+	.tag-pill {
+		background: linear-gradient(
+			90deg,
+			color-mix(in srgb, var(--color-note) 16%, transparent),
+			color-mix(in srgb, var(--color-mint) 16%, transparent)
+		);
+	}
+	.tag-pill:hover {
+		background: linear-gradient(
+			90deg,
+			color-mix(in srgb, var(--color-note) 30%, transparent),
+			color-mix(in srgb, var(--color-mint) 30%, transparent)
+		);
+	}
+</style>

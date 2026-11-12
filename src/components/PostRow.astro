@@ -20,7 +20,7 @@ const url = entryUrl('posts', id);
 ---
 
 <article data-tags={JSON.stringify(tags)} class="grid grid-cols-1 gap-x-3.5 border-b border-dotted border-line py-3 sm:grid-cols-[4rem_1fr]">
-	<time datetime={date.toISOString()} class="pt-1 font-mono text-xs text-muted">{formatDate(date, 'monthDay')}</time>
+	<time datetime={date.toISOString()} class="pt-0.5 text-sm text-muted">{formatDate(date, 'dayMonth')}</time>
 	<div>
 		<a href={url} class="font-semibold no-underline hover:underline">{title}</a>
 		<PictureStrip images={images} postTitle={title} postUrl={url} />

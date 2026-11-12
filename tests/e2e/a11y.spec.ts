@@ -20,7 +20,7 @@ for (const path of PAGES) {
 test('missing pages get a 404 with a way home', async ({ page }) => {
 	const res = await page.goto('/this-page-does-not-exist/');
 	expect(res?.status()).toBe(404);
-	await expect(page.getByText('404 · page not found')).toBeVisible();
+	await expect(page.getByRole('heading', { name: 'Page not found' })).toBeVisible();
 	await expect(page.locator('main').getByRole('link', { name: /home/ })).toHaveAttribute('href', '/');
 });
 

@@ -9,8 +9,8 @@ test('title, meta line and tag pills', async ({ page }) => {
 	await page.goto(URL);
 	await expect(page.locator('h1')).toHaveText('Sample post: everything this site can render');
 	const meta = page.locator('[data-entry-meta]');
-	await expect(meta).toContainText('2026-11-02');
-	await expect(meta).toContainText('min read');
+	await expect(meta).toContainText('Created on 2 November 2026, last updated on 12 November 2026.');
+	await expect(meta).toContainText(/minute read/);
 	// Frontmatter says [Guitar, practice, 3D]: tags are normalised to lowercase.
 	await expect(meta.getByRole('link')).toHaveText(['#guitar', '#practice', '#3d']);
 	await expect(meta.getByRole('link', { name: '#guitar' })).toHaveAttribute('href', '/posts/?tag=guitar');
@@ -63,7 +63,7 @@ test('table of contents: sticky sidebar on wide screens', async ({ page }) => {
 	await page.goto(URL);
 	const toc = page.locator('nav[aria-label="Table of contents"]');
 	await expect(toc).toBeVisible();
-	await expect(page.getByText('on this page')).toBeVisible();
+	await expect(page.locator('.toc-label')).toHaveText('Contents');
 	const headings = await page.locator('.prose h2:not(#footnote-label), .prose h3').count();
 	await expect(toc.getByRole('link')).toHaveCount(headings);
 	expect(headings).toBeGreaterThanOrEqual(2);
@@ -74,7 +74,7 @@ test('table of contents: folded box on phones', async ({ page }) => {
 	await page.goto(URL);
 	const details = page.locator('details.toc');
 	await expect(details).not.toHaveAttribute('open');
-	await expect(details.locator('summary')).toHaveText('contents');
+	await expect(details.locator('summary')).toHaveText('Contents');
 });
 
 test('the meta description is the post preview', async ({ page }) => {
@@ -163,4 +163,13 @@ test.describe('code block on a phone', () => {
 		await page.goto(URL);
 		await expect(page.locator('.prose .expressive-code').first().getByRole('button', { name: 'Copy to clipboard' })).toBeHidden();
 	});
+});
+
+test('tags are italic serif with a lavender-to-mint background', async ({ page }) => {
+	await page.goto(URL);
+	const pill = page.locator('[data-entry-meta]').getByRole('link', { name: '#guitar' });
+	const style = await pill.evaluate((el) => getComputedStyle(el));
+	expect(style.fontStyle).toBe('italic');
+	expect(style.fontFamily).toContain('Lora');
+	expect(style.backgroundImage).toContain('linear-gradient');
 });

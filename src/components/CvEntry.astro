@@ -1,5 +1,5 @@
 ---
-// One job or study entry: "Role · Organisation" with dates on the right, location, then details.
+// One job or study entry: "Role at Organisation" with dates on the right, location, then details.
 // The dot on the timeline is filled while the entry is ongoing (end: 'present').
 import type { CvEntry } from '../data/cv';
 
@@ -12,10 +12,10 @@ const { entry } = Astro.props;
 
 <div data-cv-entry class:list={['entry relative mb-4', { ongoing: entry.end === 'present' }]}>
 	<div class="flex flex-wrap items-baseline justify-between gap-x-3">
-		<span data-cv-title><b class="font-semibold text-strong">{entry.title}</b> · {entry.org}</span>
-		<span data-cv-when class="font-mono text-xs whitespace-nowrap text-muted">{entry.start} – {entry.end}</span>
+		<span data-cv-title><b class="font-semibold text-strong">{entry.title}</b> at {entry.org}</span>
+		<span data-cv-when class="text-sm whitespace-nowrap text-muted">{entry.start} – {entry.end}</span>
 	</div>
-	{entry.location && <div class="font-mono text-xs text-muted">{entry.location}</div>}
+	{entry.location && <div class="text-sm text-muted">{entry.location}</div>}
 	{entry.note && <p class="mt-1 text-[0.95em]">{entry.note}</p>}
 	{
 		entry.bullets && (

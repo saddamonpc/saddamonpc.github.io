@@ -23,6 +23,7 @@ const posts = defineCollection({
 		z.object({
 			title: z.string(),
 			date,
+			updated: date.optional(), // optional: when you last changed it
 			tags,
 			cover: image().optional(),
 			draft: z.boolean().optional(),
@@ -35,6 +36,7 @@ const projects = defineCollection({
 		z.object({
 			title: z.string(),
 			date,
+			updated: date.optional(), // optional: when you last changed it
 			tags,
 			cover: image().optional(),
 			draft: z.boolean().optional(),
