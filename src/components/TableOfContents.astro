@@ -9,6 +9,9 @@ interface Props {
 }
 
 const items = Astro.props.headings.filter((h) => (h.depth === 2 || h.depth === 3) && h.slug !== 'footnote-label');
+
+// Each entry's place on the pistachio-to-mint scale: 0% for the first, 100% for the last, evenly spread between.
+const mix = (i: number) => (items.length > 1 ? Math.round((i / (items.length - 1)) * 100) : 0);
 ---
 
 {
@@ -18,9 +21,9 @@ const items = Astro.props.headings.filter((h) => (h.depth === 2 || h.depth === 3
 			<p class="toc-label mb-2 font-semibold text-strong">Contents</p>
 			<nav aria-label="Table of contents">
 				<ol class="mt-2 flex flex-col gap-1 font-mono text-sm leading-snug lg:mt-0">
-					{items.map((h) => (
+					{items.map((h, i) => (
 						<li class={h.depth === 3 ? 'pl-3' : ''}>
-							<a href={`#${h.slug}`} class="toc-link block py-1 pl-2.5 text-muted no-underline">
+							<a href={`#${h.slug}`} class="toc-link block py-1 pl-2.5 text-muted no-underline" style={`--mix: ${mix(i)}%`}>
 								{h.text}
 							</a>
 						</li>
@@ -42,19 +45,24 @@ const items = Astro.props.headings.filter((h) => (h.depth === 2 || h.depth === 3
 		display: block;
 	}
 
-	/* Each entry glows faintly, like a quote. The section being read glows brighter, with the pistachio-to-mint bar. */
+	/*
+	  The whole list runs from pistachio (first entry) to mint (last): each entry has its own colour
+	  on that scale (--mix, set above). Each glows faintly in it, like a quote; the section being read
+	  lights up brightly in it.
+	*/
 	.toc-link {
+		--toc-color: color-mix(in srgb, var(--color-accent), var(--color-mint) var(--mix, 0%));
 		border-left: 2px solid var(--color-line);
-		background: linear-gradient(90deg, color-mix(in srgb, var(--color-accent) 7%, transparent), transparent 85%);
+		background: linear-gradient(90deg, color-mix(in srgb, var(--toc-color) 7%, transparent), transparent 85%);
 	}
 	.toc-link:hover {
 		color: var(--color-fg);
-		background: linear-gradient(90deg, color-mix(in srgb, var(--color-accent) 12%, transparent), transparent 85%);
+		background: linear-gradient(90deg, color-mix(in srgb, var(--toc-color) 12%, transparent), transparent 85%);
 	}
 	.toc-link[aria-current='true'] {
-		color: var(--color-accent);
-		border-image: linear-gradient(to bottom, var(--color-accent), var(--color-mint)) 1;
-		background: linear-gradient(90deg, color-mix(in srgb, var(--color-accent) 18%, transparent), transparent 85%);
+		color: var(--toc-color);
+		border-left-color: var(--toc-color);
+		background: linear-gradient(90deg, color-mix(in srgb, var(--toc-color) 18%, transparent), transparent 85%);
 	}
 </style>
 

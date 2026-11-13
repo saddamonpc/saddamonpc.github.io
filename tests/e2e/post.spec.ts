@@ -99,6 +99,17 @@ test('long inline code wraps inside its box', async ({ page }) => {
 	expect(code.x + code.width).toBeLessThanOrEqual(box.x + box.width);
 });
 
+test('text is justified, with hyphenation; headings and captions are not', async ({ page }) => {
+	await page.goto(URL);
+	const style = (selector: string) => page.locator(selector).first().evaluate((el) => getComputedStyle(el));
+	for (const selector of ['.prose > p', '.prose li', '.prose blockquote:not(.callout) p']) {
+		expect((await style(selector)).textAlign, selector).toBe('justify');
+		expect((await style(selector)).hyphens, selector).toBe('auto');
+	}
+	expect((await style('.prose h2')).textAlign).not.toBe('justify');
+	expect((await style('.prose figure:has(img) figcaption')).textAlign).toBe('center');
+});
+
 test('bullet lists are tight: small gaps between items, nested ones included', async ({ page }) => {
 	await page.goto(URL);
 	const items = page.locator('.prose ul:not(.contains-task-list)').first().locator('li');
@@ -138,6 +149,28 @@ test('table of contents: each entry has a soft glow like the quotes, the current
 	await page.mouse.move(0, 0); // no hover glow in the way
 	expect(await glow(1)).toContain('linear-gradient');
 	expect(await glow(1)).not.toBe(await glow(0)); // the current section stands out
+});
+
+test('table of contents: the current entry lights up from pistachio (first) to mint (last)', async ({ page }) => {
+	await page.setViewportSize({ width: 1280, height: 900 });
+	await page.goto(URL);
+	const links = page.locator('nav[aria-label="Table of contents"] a');
+	// The colour each entry lights up in when it's the current section, as [red, green, blue].
+	const colours = await links.evaluateAll((all) =>
+		all.map((link) => {
+			link.setAttribute('aria-current', 'true');
+			const colour = getComputedStyle(link).color;
+			link.setAttribute('aria-current', 'false');
+			const numbers = colour.match(/[\d.]+/g)!.map(Number);
+			return colour.startsWith('color(') ? numbers.slice(0, 3).map((n) => Math.round(n * 255)) : numbers.slice(0, 3);
+		}),
+	);
+	const close = (actual: number[], expected: number[]) => actual.every((n, i) => Math.abs(n - expected[i]) <= 2);
+	expect(close(colours[0], [151, 218, 126]), `first ${colours[0]}`).toBe(true); // pistachio
+	expect(close(colours.at(-1)!, [111, 220, 176]), `last ${colours.at(-1)}`).toBe(true); // mint
+	// Every step moves further from pistachio towards mint.
+	const blue = colours.map((c) => c[2]);
+	for (let i = 1; i < blue.length; i++) expect(blue[i]).toBeGreaterThan(blue[i - 1]);
 });
 
 test('table of contents: folded box on phones', async ({ page }) => {

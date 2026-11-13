@@ -26,6 +26,16 @@
 	line-height: 1.7;
 }
 
+/*
+  Text is justified (straight right edge). Hyphenation keeps the gaps between words even,
+  which matters most on narrow phone screens. Headings, captions and code stay as they are.
+*/
+.prose p,
+.prose li {
+	text-align: justify;
+	hyphens: auto;
+}
+
 /* Headings: a thin line under h2, never a visible # mark. */
 .prose h2 {
 	border-bottom: 1px solid var(--color-line);
