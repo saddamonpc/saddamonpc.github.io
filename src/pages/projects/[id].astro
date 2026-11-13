@@ -11,7 +11,7 @@ export async function getStaticPaths() {
 
 const { project } = Astro.props;
 const { Content, headings, remarkPluginFrontmatter } = await render(project);
-const { title, date, updated, tags, cover, category, tools, timeframe } = project.data;
+const { title, date, updated, tags, cover, tools } = project.data;
 ---
 
 <EntryLayout
@@ -24,7 +24,7 @@ const { title, date, updated, tags, cover, category, tools, timeframe } = projec
 	headings={headings}
 	readingMinutes={remarkPluginFrontmatter.readingMinutes}
 	description={remarkPluginFrontmatter.excerpt}
-	facts={{ category, tools, timeframe }}
+	tools={tools}
 >
 	<Content />
 </EntryLayout>

@@ -68,7 +68,7 @@ Only the note named like its folder is published. Other notes in the folder (an 
 
 `src/content/posts/sample-post/`, `src/content/posts/test-newer-post/` and `src/content/projects/sample-project/` are drafts: they show in `npm run dev` and in the tests, never on the real site. Keep them, because the tests use them.
 
-Projects work the same way in `src/content/projects/`, and can also have `category`, `tools: [ZBrush, Blender]` and `timeframe: Sep – Oct 2026`, which show in a strip under the title.
+Projects work the same way in `src/content/projects/`, and can also have `tools: [ZBrush, Blender]`, shown under the date as "Made with ZBrush and Blender."
 
 ### Writing on several computers (Obsidian Sync)
 

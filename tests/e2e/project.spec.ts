@@ -1,15 +1,10 @@
 import { expect, test } from '@playwright/test';
 
-test('project page shows the facts strip', async ({ page }) => {
+test('project page says what it was made with, as a sentence', async ({ page }) => {
 	await page.goto('/projects/sample-project/');
 	await expect(page.locator('h1')).toHaveText('Sample project: a stylised bust');
-	const facts = page.locator('[data-facts]');
-	await expect(facts).toContainText('category');
-	await expect(facts).toContainText('3D');
-	await expect(facts).toContainText('tools');
-	await expect(facts).toContainText('ZBrush, Blender');
-	await expect(facts).toContainText('timeframe');
-	await expect(facts).toContainText('Sep – Oct 2026');
+	await expect(page.locator('[data-entry-meta] [data-tools]')).toHaveText('Made with ZBrush and Blender.');
+	await expect(page.locator('[data-facts]')).toHaveCount(0);
 	await expect(page.locator('[data-entry-meta]').getByRole('link', { name: '#3d' })).toHaveAttribute('href', '/projects/?tag=3d');
 	await expect(page.locator('nav[aria-label="Main"] a[aria-current="page"]')).toHaveText('projects');
 });
@@ -34,7 +29,7 @@ test('empty Obsidian properties count as not filled in', async ({ page }) => {
 	await expect(page.locator('[data-hero]')).toHaveCount(0);
 });
 
-test('posts have no facts strip', async ({ page }) => {
+test('no "Made with" line without tools (posts never have them)', async ({ page }) => {
 	await page.goto('/posts/sample-post/');
-	await expect(page.locator('[data-facts]')).toHaveCount(0);
+	await expect(page.locator('[data-tools]')).toHaveCount(0);
 });

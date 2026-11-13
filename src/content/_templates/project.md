@@ -6,10 +6,8 @@ tags:
   - example
 cover:
 draft: true
-category: 3D
 tools:
   - Blender
-timeframe: Sep – Oct 2026
 ---
 %%
 REQUIRED: title, date. Everything else is optional: delete it or leave it empty.
@@ -19,7 +17,7 @@ REQUIRED: title, date. Everything else is optional: delete it or leave it empty.
 - tags: one per line, e.g. blender. They become the tag buttons on the projects page.
 - cover: a header picture in this folder, e.g. ./cover.jpg. Also the project's picture on the projects page. Empty here because a picture that doesn't exist stops the site from building.
 - draft: ticked (true) while writing; it then only shows in `npm run dev`. Untick or delete it to publish.
-- category, tools, timeframe: shown in a strip under the title. tools: one per line.
+- tools: one per line. Shown under the date as "Made with Blender and SheepIt."
 This note never shows on the site (but the repo is public); delete it whenever you like.
 %%
 

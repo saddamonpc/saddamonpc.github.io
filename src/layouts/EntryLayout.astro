@@ -20,19 +20,13 @@ interface Props {
 	headings: MarkdownHeading[];
 	readingMinutes: number;
 	description: string;
-	facts?: { category?: string; tools?: string[]; timeframe?: string };
+	tools?: string[]; // projects: "Made with ZBrush and Blender."
 }
 
-const { collection, title, date, updated, tags, cover, headings, readingMinutes, description, facts = {} } = Astro.props;
+const { collection, title, date, updated, tags, cover, headings, readingMinutes, description, tools = [] } = Astro.props;
 // "last updated" only when it's a later day than created (the templates fill in both with today's date).
 const lastUpdated = updated && formatDate(updated, 'long') !== formatDate(date, 'long') ? formatDate(updated, 'long') : null;
-
-// Project facts strip (category, tools, timeframe). Only the ones that are filled in are shown.
-const factRows = [
-	{ label: 'category', value: facts.category },
-	{ label: 'tools', value: facts.tools?.join(', ') },
-	{ label: 'timeframe', value: facts.timeframe },
-].filter((row) => row.value);
+const madeWith = tools.length > 0 ? new Intl.ListFormat('en', { type: 'conjunction' }).format(tools) : null; // "A, B and C"
 ---
 
 <BaseLayout title={title} description={description} image={cover} current={collection}>
@@ -53,20 +47,9 @@ const factRows = [
 						Created on {formatDate(date, 'long')}{lastUpdated && <>, last updated on {lastUpdated}</>}.
 					</p>
 					<p>{readingTime(readingMinutes)}</p>
+					{madeWith && <p data-tools>Made with {madeWith}.</p>}
 					<div class="mt-2"><TagPills tags={tags} collection={collection} /></div>
 				</div>
-				{
-					factRows.length > 0 && (
-						<dl data-facts class="mt-4 flex flex-wrap gap-x-6 gap-y-1 border-y border-dashed border-line py-2 text-sm text-muted">
-							{factRows.map((row) => (
-								<div class="flex gap-2">
-									<dt class="font-semibold text-fg">{row.label}</dt>
-									<dd>{row.value}</dd>
-								</div>
-							))}
-						</dl>
-					)
-				}
 			</header>
 			<aside class="mt-6 lg:sticky lg:top-6 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:mt-10 lg:self-start">
 				<TableOfContents headings={headings} />

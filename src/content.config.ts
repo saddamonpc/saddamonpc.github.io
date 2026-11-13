@@ -43,9 +43,7 @@ const projects = defineCollection({
 			tags,
 			cover: optional(image()),
 			draft: optional(z.boolean()),
-			category: optional(z.string()),
 			tools: optional(z.array(z.string())),
-			timeframe: optional(z.string()),
 		}),
 });
 
