@@ -1,6 +1,7 @@
 ---
 title: 'Sample project: a stylised bust'
 date: 2026-10-01
+updated: 2026-10-01 # the same day as date, as the template fills it in: shows no "last updated"
 draft: true # never published: shows only in `npm run dev` and in the tests
 tags: [3d, zbrush, drawing]
 cover: ./cover.jpg

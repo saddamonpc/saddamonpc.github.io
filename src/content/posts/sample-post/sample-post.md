@@ -19,6 +19,13 @@ Text can be **bold**, _italic_, or ==highlighted==. Inline code looks like `npm 
 
 ### Lists and tables
 
+- Warm up with chromatic runs
+  - One finger per fret
+  - Slowly, with a metronome
+- Then the barre chords. Links to a heading in the same note, like [[#Callouts]], jump down the page.
+
+A checklist:
+
 - [x] Lower the action at the nut
 - [x] Roll the index finger toward the headstock
 - [ ] Hold the shape for 30 seconds, three times a day
@@ -43,7 +50,7 @@ Text can be **bold**, _italic_, or ==highlighted==. Inline code looks like `npm 
 > Unknown types fall back to the note style.
 
 > [!note]- Click to open
-> Foldable callouts start closed.
+> Foldable callouts start closed. Long code wraps instead of running out of the box: `blender -b scene.blend -o //render/frame_#### -f 37..39,42,44..46,52,54,60..61,63..64,66,69,73,79,82,87,89,93..95,98..99,104..105`
 
 ## Code
 

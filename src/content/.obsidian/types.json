@@ -1,0 +1,13 @@
+{
+  "types": {
+    "title": "text",
+    "date": "date",
+    "updated": "date",
+    "tags": "tags",
+    "cover": "text",
+    "draft": "checkbox",
+    "category": "text",
+    "tools": "multitext",
+    "timeframe": "text"
+  }
+}

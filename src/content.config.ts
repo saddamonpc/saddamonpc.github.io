@@ -5,7 +5,7 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
-import { normalizeTags, utcDate } from './lib/content';
+import { emptyToUndefined, normalizeTags, utcDate } from './lib/content';
 import { listEntries } from './lib/content-files';
 
 const folderName = ({ entry }: { entry: string }) => entry.split('/')[0];
@@ -15,18 +15,21 @@ const entryFiles = (collection: 'posts' | 'projects') => {
 	return files.length > 0 ? files : ['__none__/__none__.md'];
 };
 const date = z.preprocess(utcDate, z.coerce.date());
-const tags = z.array(z.string()).default([]).transform(normalizeTags);
+// Optional properties can be missing, or left empty in Obsidian ("cover:" with nothing after it).
+const optional = <T extends z.ZodType>(schema: T) => z.preprocess(emptyToUndefined, schema.optional());
+const tags = optional(z.array(z.string())).transform((list) => normalizeTags(list ?? []));
 
+// Required: title and date. Everything else is optional.
 const posts = defineCollection({
 	loader: glob({ base: './src/content/posts', pattern: entryFiles('posts'), generateId: folderName }),
 	schema: ({ image }) =>
 		z.object({
 			title: z.string(),
 			date,
-			updated: date.optional(), // optional: when you last changed it
+			updated: optional(date), // when you last changed it (the same day as date shows nothing)
 			tags,
-			cover: image().optional(),
-			draft: z.boolean().optional(),
+			cover: optional(image()),
+			draft: optional(z.boolean()),
 		}),
 });
 
@@ -36,13 +39,13 @@ const projects = defineCollection({
 		z.object({
 			title: z.string(),
 			date,
-			updated: date.optional(), // optional: when you last changed it
+			updated: optional(date), // when you last changed it (the same day as date shows nothing)
 			tags,
-			cover: image().optional(),
-			draft: z.boolean().optional(),
-			category: z.string().optional(),
-			tools: z.array(z.string()).optional(),
-			timeframe: z.string().optional(),
+			cover: optional(image()),
+			draft: optional(z.boolean()),
+			category: optional(z.string()),
+			tools: optional(z.array(z.string())),
+			timeframe: optional(z.string()),
 		}),
 });
 

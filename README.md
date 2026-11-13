@@ -45,18 +45,22 @@ Open `src/content/` as a vault in Obsidian. Its settings (in `src/content/.obsid
    | Kenapa saya belajar gitar lagi?                            | `kenapa-belajar-gitar-lagi`    |
 
 2. Inside it, make a note with the **same name**: `barre-chords/barre-chords.md`. (Same name, so Obsidian's `[[barre-chords]]` links can find it.) If you rename one in Obsidian, rename the other too.
-3. Fill the note in with the template: run "Templates: Insert template" (Ctrl+P) and pick `post` (or `project`). It adds today's date and `draft: true`. Turn on Obsidian's **Templates** core plugin once first (Settings, Core plugins); the template folder `_templates` is already set. The frontmatter looks like this:
+3. Fill the note in with the template: run "Templates: Insert template" (Ctrl+P) and pick `post` (or `project`). Turn on Obsidian's **Templates** core plugin once first (Settings, Core plugins); the template folder `_templates` is already set. It lays out every property with today's date and sample values, plus a hidden `%% … %%` note saying what each one is for (it never shows on the site; delete it when you like):
 
    ```yaml
    ---
-   title: Learning barre chords, again
-   date: 2026-10-18
-   updated: 2026-11-02 # optional: add when you change the post later
-   tags: [guitar, practice]
-   cover: ./cover.jpg # optional header image, in the same folder
-   draft: true # optional: shows in `npm run dev`, hidden on the real site
+   title: Learning barre chords, again # required
+   date: 2026-10-18 # required
+   updated: 2026-11-02 # when you last changed it; the same day as date shows nothing
+   tags:
+     - guitar
+     - practice
+   cover: ./cover.jpg # header picture in the same folder
+   draft: true # shows in `npm run dev`, hidden on the real site
    ---
    ```
+
+   Only `title` and `date` are required: if one is missing, `npm run dev` shows an error naming it. Any other property can be deleted or left empty (`cover:` with nothing after it).
 
 4. Write. The page appears at `/posts/barre-chords/`.
 
@@ -78,7 +82,7 @@ Obsidian Sync moves your writing between computers (and your phone) as you type.
 
 - Normal Markdown: headings, **bold**, _italic_, links, lists, tables, `code`, footnotes.
 - Obsidian extras: `==highlight==`, `%%hidden comments%%` (hidden on the site, but this repo is public, so anyone can read them on GitHub, like drafts), callouts (`> [!tip]`, `> [!note]`, `> [!warning]` and Obsidian's other types, plus foldable `> [!note]-`).
-- Links to other notes: `[[sample-project]]`, `[[sample-project|your own text]]`, `[[sample-project#A heading]]`.
+- Links to other notes: `[[sample-project]]`, `[[sample-project|your own text]]`, `[[sample-project#A heading]]`, and to a heading in the same note: `[[#A heading]]`.
 - Pictures: `![[photo.jpg]]`, `![[photo.jpg|caption]]`, or `![caption](./photo.jpg)`. The caption shows under the picture and is read aloud to people who can't see it, so add one where you can.
 - Audio: `![[take.mp3|Title · recorded 2026-10-18]]`, with the file in the same folder (mp3, m4a, wav, ogg).
 - Video: `![[clip.mp4|Caption]]`, with the file in the same folder (mp4, webm, mov, m4v). Keep each file well under 100 MB (GitHub's limit); mp4 plays everywhere.

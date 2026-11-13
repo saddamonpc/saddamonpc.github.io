@@ -23,6 +23,8 @@ interface Props {
 }
 
 const { collection, title, date, updated, tags, cover, headings, readingMinutes, description, facts = {} } = Astro.props;
+// "last updated" only when it's a later day than created (the templates fill in both with today's date).
+const lastUpdated = updated && formatDate(updated, 'long') !== formatDate(date, 'long') ? formatDate(updated, 'long') : null;
 
 // Project facts strip (category, tools, timeframe). Only the ones that are filled in are shown.
 const factRows = [
@@ -46,7 +48,7 @@ const factRows = [
 				<h1 class="mb-2 text-3xl leading-tight font-semibold text-strong sm:text-4xl">{title}</h1>
 				<div data-entry-meta class="text-sm text-muted">
 					<p>
-						Created on {formatDate(date, 'long')}{updated && <>, last updated on {formatDate(updated, 'long')}</>}.
+						Created on {formatDate(date, 'long')}{lastUpdated && <>, last updated on {lastUpdated}</>}.
 					</p>
 					<p>{readingTime(readingMinutes)}</p>
 					<div class="mt-2"><TagPills tags={tags} collection={collection} /></div>

@@ -3,6 +3,8 @@ title: 'Test: a newer post'
 date: 2026-12-01
 draft: true # never published: exists so the tests prove the site works with more than one post
 tags: [guitar, notes]
+updated: # left empty, like Obsidian does when you clear a property: means "not filled in"
+cover:
 ---
 
 <!-- TEST FIXTURE: stands in for "your next real post" in the tests. Keep it. -->

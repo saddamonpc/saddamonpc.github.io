@@ -17,13 +17,10 @@ const items = Astro.props.headings.filter((h) => (h.depth === 2 || h.depth === 3
 			<summary class="cursor-pointer font-semibold text-strong">Contents</summary>
 			<p class="toc-label mb-2 font-semibold text-strong">Contents</p>
 			<nav aria-label="Table of contents">
-				<ol class="mt-2 font-mono text-sm leading-snug lg:mt-0">
+				<ol class="mt-2 flex flex-col gap-1 font-mono text-sm leading-snug lg:mt-0">
 					{items.map((h) => (
 						<li class={h.depth === 3 ? 'pl-3' : ''}>
-							<a
-								href={`#${h.slug}`}
-								class="block border-l-2 border-line py-1 pl-2.5 text-muted no-underline hover:text-fg aria-[current=true]:border-accent aria-[current=true]:text-accent"
-							>
+							<a href={`#${h.slug}`} class="toc-link block py-1 pl-2.5 text-muted no-underline">
 								{h.text}
 							</a>
 						</li>
@@ -43,6 +40,21 @@ const items = Astro.props.headings.filter((h) => (h.depth === 2 || h.depth === 3
 	}
 	.toc[data-wide] .toc-label {
 		display: block;
+	}
+
+	/* Each entry glows faintly, like a quote. The section being read glows brighter, with the pistachio-to-mint bar. */
+	.toc-link {
+		border-left: 2px solid var(--color-line);
+		background: linear-gradient(90deg, color-mix(in srgb, var(--color-accent) 7%, transparent), transparent 85%);
+	}
+	.toc-link:hover {
+		color: var(--color-fg);
+		background: linear-gradient(90deg, color-mix(in srgb, var(--color-accent) 12%, transparent), transparent 85%);
+	}
+	.toc-link[aria-current='true'] {
+		color: var(--color-accent);
+		border-image: linear-gradient(to bottom, var(--color-accent), var(--color-mint)) 1;
+		background: linear-gradient(90deg, color-mix(in srgb, var(--color-accent) 18%, transparent), transparent 85%);
 	}
 </style>
 

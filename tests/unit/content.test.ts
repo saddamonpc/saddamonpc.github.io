@@ -1,5 +1,20 @@
 import { describe, expect, test } from 'vitest';
-import { entryUrl, normalizeTags, tagUrl, utcDate } from '../../src/lib/content';
+import { emptyToUndefined, entryUrl, normalizeTags, tagUrl, utcDate } from '../../src/lib/content';
+
+describe('emptyToUndefined', () => {
+	test('an emptied Obsidian property ("key:", "", or an empty list) counts as not filled in', () => {
+		expect(emptyToUndefined(null)).toBeUndefined();
+		expect(emptyToUndefined('')).toBeUndefined();
+		expect(emptyToUndefined('  ')).toBeUndefined();
+		expect(emptyToUndefined([])).toBeUndefined();
+	});
+
+	test('real values are left alone', () => {
+		expect(emptyToUndefined('3D')).toBe('3D');
+		expect(emptyToUndefined(['Blender'])).toEqual(['Blender']);
+		expect(emptyToUndefined(false)).toBe(false);
+	});
+});
 
 describe('normalizeTags', () => {
 	test('lowercases, trims, drops empties and duplicates, keeps first-seen order', () => {

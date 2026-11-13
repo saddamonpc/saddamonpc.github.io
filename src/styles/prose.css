@@ -44,6 +44,14 @@
 	border-radius: 3px;
 }
 
+/* Lists: tight, with small gaps between items (nested lists and items with paragraphs too). */
+.prose li,
+.prose li > p,
+.prose li > ul,
+.prose li > ol {
+	margin-block: 0.2em;
+}
+
 /* Inline `code` (the plugin adds backticks around it; remove them). */
 .prose :not(pre) > code {
 	font-family: var(--font-mono);
@@ -53,6 +61,10 @@
 	border: 1px solid var(--color-line);
 	border-radius: 4px;
 	padding: 0.1em 0.35em;
+	/* A long command or path wraps instead of running out of its box; each line keeps its rounded box. */
+	overflow-wrap: anywhere;
+	box-decoration-break: clone;
+	-webkit-box-decoration-break: clone;
 }
 .prose code::before,
 .prose code::after {
@@ -218,6 +230,7 @@
 }
 .prose .callout-title {
 	display: flex;
+	align-items: center;
 	gap: 0.4em;
 	font-family: var(--font-mono);
 	font-size: 0.85em;
@@ -227,8 +240,44 @@
 .prose .callout-title::before {
 	content: var(--callout-icon);
 }
+/*
+  Foldable callouts (> [!note]- Title): the arrow after the title points right when closed and
+  turns down when open, and the box slides open. The sliding needs a recent browser (::details-content);
+  older ones simply open it.
+*/
 .prose summary.callout-title {
 	cursor: pointer;
+	list-style: none; /* no browser triangle: the plugin's arrow is used instead */
+}
+.prose summary.callout-title::-webkit-details-marker {
+	display: none;
+}
+.prose .callout-fold-icon {
+	display: flex;
+	transform: rotate(-90deg);
+	transition: transform 0.25s ease;
+}
+.prose details.callout[open] .callout-fold-icon {
+	transform: none;
+}
+.prose details.callout {
+	interpolate-size: allow-keywords; /* lets "auto" height be animated */
+}
+.prose details.callout::details-content {
+	block-size: 0;
+	overflow-y: clip;
+	transition:
+		block-size 0.25s ease,
+		content-visibility 0.25s allow-discrete;
+}
+.prose details.callout[open]::details-content {
+	block-size: auto;
+}
+@media (prefers-reduced-motion: reduce) {
+	.prose .callout-fold-icon,
+	.prose details.callout::details-content {
+		transition: none;
+	}
 }
 .prose .callout-content > :first-child {
 	margin-top: 0.25rem;

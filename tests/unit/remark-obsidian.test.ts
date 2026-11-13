@@ -32,6 +32,11 @@ describe('links between notes', () => {
 		expect(html).toContain('>renders</a>');
 	});
 
+	test('[[#Heading]] links to a heading in the same note', () => {
+		expect(render('See [[#Overview / Story / Thoughts]].')).toContain('<a href="#overview--story--thoughts" class="wikilink">Overview / Story / Thoughts</a>');
+		expect(render('[[#Notes|the notes]]')).toContain('<a href="#notes" class="wikilink">the notes</a>');
+	});
+
 	test('a missing note becomes plain text and warns once', () => {
 		const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
 		expect(render('[[nope]]')).toContain('<span class="wikilink-missing">nope</span>');

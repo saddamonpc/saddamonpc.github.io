@@ -2,6 +2,12 @@
 
 export type CollectionName = 'posts' | 'projects';
 
+/** Obsidian writes a property you've cleared as `key:` (no value), `key: ""` or `key: []`. All mean "not filled in". */
+export function emptyToUndefined(value: unknown): unknown {
+	const empty = value === null || (typeof value === 'string' && value.trim() === '') || (Array.isArray(value) && value.length === 0);
+	return empty ? undefined : value;
+}
+
 /** Tags are case-insensitive: "3D", " 3d " and "3d" are the same tag. */
 export function normalizeTags(tags: string[]): string[] {
 	const cleaned = tags.map((tag) => tag.trim().toLowerCase()).filter((tag) => tag !== '');

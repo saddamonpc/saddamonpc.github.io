@@ -66,6 +66,56 @@ test('callouts use the three styles, unknown types fall back to note', async ({ 
 	await expect(foldable).not.toHaveAttribute('open');
 });
 
+test('foldable callout: the arrow sits on the title line, points right when closed and down when open', async ({ page }) => {
+	await page.goto(URL);
+	const foldable = page.locator('details[data-callout="note"]');
+	const arrow = foldable.locator('.callout-fold-icon');
+	const middle = async (selector: string) => {
+		const box = (await foldable.locator(selector).boundingBox())!;
+		return box.y + box.height / 2;
+	};
+	expect(Math.abs((await middle('.callout-fold-icon')) - (await middle('.callout-title-text')))).toBeLessThanOrEqual(1.5);
+	const angle = () => arrow.evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).b); // sin of the rotation
+	await expect.poll(angle).toBeCloseTo(-1); // turned a quarter: pointing right
+	await foldable.locator('summary').click();
+	await expect.poll(angle).toBeCloseTo(0); // pointing down
+});
+
+test('foldable callout slides open instead of jumping', async ({ page }) => {
+	await page.goto(URL);
+	const transition = await page
+		.locator('details[data-callout="note"]')
+		.evaluate((el) => getComputedStyle(el, '::details-content').transitionProperty);
+	expect(transition).toContain('block-size');
+});
+
+test('long inline code wraps inside its box', async ({ page }) => {
+	await page.setViewportSize({ width: 375, height: 740 });
+	await page.goto(URL);
+	const foldable = page.locator('details[data-callout="note"]');
+	await foldable.locator('summary').click();
+	const code = (await foldable.locator('code').boundingBox())!;
+	const box = (await foldable.boundingBox())!;
+	expect(code.x + code.width).toBeLessThanOrEqual(box.x + box.width);
+});
+
+test('bullet lists are tight: small gaps between items, nested ones included', async ({ page }) => {
+	await page.goto(URL);
+	const items = page.locator('.prose ul:not(.contains-task-list)').first().locator('li');
+	const boxes = await items.evaluateAll((lis) => lis.map((li) => li.getBoundingClientRect().toJSON() as DOMRect));
+	// Gaps between where one item's own line ends and the next item starts.
+	const lineHeight = await items.first().evaluate((el) => Number.parseFloat(getComputedStyle(el).lineHeight));
+	const firstLineBottom = boxes[0].top + lineHeight;
+	expect(boxes[1].top - firstLineBottom, 'first item to its nested item').toBeLessThanOrEqual(5);
+	expect(boxes[2].top - boxes[1].bottom, 'between nested items').toBeLessThanOrEqual(5);
+	expect(boxes[3].top - boxes[0].bottom, 'after the nested list').toBeLessThanOrEqual(5);
+});
+
+test('a [[#Heading]] link jumps to the heading in the same note', async ({ page }) => {
+	await page.goto(URL);
+	await expect(page.locator('.prose a.wikilink', { hasText: 'Callouts' })).toHaveAttribute('href', '#callouts');
+});
+
 test('table of contents: sticky sidebar on wide screens', async ({ page }) => {
 	await page.setViewportSize({ width: 1280, height: 900 });
 	await page.goto(URL);
@@ -75,6 +125,19 @@ test('table of contents: sticky sidebar on wide screens', async ({ page }) => {
 	const headings = await page.locator('.prose h2:not(#footnote-label), .prose h3').count();
 	await expect(toc.getByRole('link')).toHaveCount(headings);
 	expect(headings).toBeGreaterThanOrEqual(2);
+});
+
+test('table of contents: each entry has a soft glow like the quotes, the current one brighter', async ({ page }) => {
+	await page.setViewportSize({ width: 1280, height: 900 });
+	await page.goto(URL);
+	const links = page.locator('nav[aria-label="Table of contents"] a');
+	const glow = (i: number) => links.nth(i).evaluate((el) => getComputedStyle(el).backgroundImage);
+	expect(await glow(0)).toContain('linear-gradient');
+	await links.nth(1).click(); // jump to the second section: it becomes the current one
+	await expect(links.nth(1)).toHaveAttribute('aria-current', 'true');
+	await page.mouse.move(0, 0); // no hover glow in the way
+	expect(await glow(1)).toContain('linear-gradient');
+	expect(await glow(1)).not.toBe(await glow(0)); // the current section stands out
 });
 
 test('table of contents: folded box on phones', async ({ page }) => {

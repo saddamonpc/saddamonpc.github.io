@@ -149,8 +149,10 @@ function embed(target: string, resolveLink: ObsidianOptions['resolveLink'], file
 function wikilink(target: string, resolveLink: ObsidianOptions['resolveLink'], file: VFile): PhrasingContent {
 	const [ref, label] = splitPipe(target);
 	const [name, heading] = ref.split('#').map((part) => part.trim());
-	const url = resolveLink(lastSegment(name));
 	const shown = label || heading || name;
+	// [[#Heading]]: a heading in this same note.
+	if (!name && heading) return { type: 'link', url: `#${slug(heading)}`, children: [text(shown)], data: { hProperties: { className: ['wikilink'] } } };
+	const url = resolveLink(lastSegment(name));
 	if (!url) {
 		console.warn(`[obsidian] ${file.path ?? 'a note'}: no post or project named "${name}"`);
 		return { type: 'html', value: `<span class="wikilink-missing">${escapeHtml(shown)}</span>` } satisfies Html;
