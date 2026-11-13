@@ -99,6 +99,69 @@ test('long inline code wraps inside its box', async ({ page }) => {
 	expect(code.x + code.width).toBeLessThanOrEqual(box.x + box.width);
 });
 
+test('reading progress: one segment per section along the top, hidden until the text starts', async ({ page }) => {
+	await page.setViewportSize({ width: 1280, height: 800 });
+	await page.goto(URL);
+	const strip = page.locator('[data-reading-progress]'); // the shade, with the chapters inside it
+	const chapters = strip.locator('.chapter');
+	const shown = () => strip.evaluate((el) => Number(getComputedStyle(el).opacity));
+	const progress = () => strip.evaluate((el) => Number(getComputedStyle(el).getPropertyValue('--progress')));
+	// How full each chapter is, from 0 to 1.
+	const fills = () => chapters.evaluateAll((all) => all.map((c) => (c.firstElementChild as HTMLElement).getBoundingClientRect().width / c.getBoundingClientRect().width));
+
+	// The opening text, then one per main heading: Writing basics, Callouts, Code, Audio and video, Pictures.
+	await expect(chapters).toHaveCount(6);
+	await expect.poll(shown).toBe(0); // at the top, over the cover: hidden
+
+	// Halfway through the text.
+	await page.evaluate(() => {
+		const text = document.querySelector('.prose')!.getBoundingClientRect();
+		window.scrollTo(0, window.scrollY + text.top + (text.height - innerHeight) / 2);
+	});
+	await expect.poll(shown).toBe(1);
+	await expect.poll(progress).toBeGreaterThan(0.4);
+	expect(await progress()).toBeLessThan(0.6);
+	const box = (await strip.locator('.chapters').boundingBox())!;
+	expect(box.y).toBe(0); // the top of the screen (the navbar has scrolled away), from edge to edge
+	expect(box.width).toBe(1280);
+	expect(box.height).toBeLessThanOrEqual(4); // thin
+
+	// Sections already read are full, the current one is part-filled, the rest are empty.
+	const now = await fills();
+	const current = now.findIndex((f) => f > 0.01 && f < 0.99);
+	expect(current, `fills ${now.map((f) => f.toFixed(2))}`).toBeGreaterThan(-1);
+	expect(now.slice(0, current).every((f) => f > 0.99)).toBe(true);
+	expect(now.slice(current + 1).every((f) => f < 0.01)).toBe(true);
+
+	// The pistachio-to-mint gradient, and the faded leading edge on the current section.
+	const fill = chapters.nth(current).locator('.fill');
+	expect(await fill.evaluate((el) => getComputedStyle(el).backgroundImage)).toMatch(/linear-gradient.*rgb\(151, 218, 126\).*rgb\(111, 220, 176\)/);
+	expect(await fill.evaluate((el) => getComputedStyle(el).maskImage)).toMatch(/rgba\(0, 0, 0, 0\.2\d*\)/);
+
+	// Behind it, a shade in the page colour fading downwards, so text slides under it instead of showing through.
+	const shade = await strip.evaluate((el) => ({ background: getComputedStyle(el).backgroundImage, height: el.getBoundingClientRect().height }));
+	expect(shade.background).toMatch(/linear-gradient\(rgb\(23, 26, 25\).*(transparent|rgba\(0, 0, 0, 0\))\)/);
+	expect(shade.height).toBeGreaterThanOrEqual(16);
+
+	// The end: every section full.
+	await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+	await expect.poll(progress).toBe(1);
+	await expect.poll(async () => (await fills()).every((f) => f > 0.99)).toBe(true);
+});
+
+test('reading progress on phones starts under the top bar, not over it', async ({ page }) => {
+	await page.setViewportSize({ width: 375, height: 740 });
+	await page.goto(URL);
+	await page.evaluate(() => {
+		const text = document.querySelector('.prose')!.getBoundingClientRect();
+		window.scrollTo(0, window.scrollY + text.top + (text.height - innerHeight) / 2);
+	});
+	const bar = page.locator('[data-reading-progress]');
+	await expect.poll(() => bar.evaluate((el) => Number(getComputedStyle(el).opacity))).toBe(1);
+	const header = (await page.locator('body > header').boundingBox())!;
+	expect((await bar.boundingBox())!.y).toBeGreaterThanOrEqual(header.y + header.height - 0.5);
+});
+
 test('text is justified, with hyphenation; headings and captions are not', async ({ page }) => {
 	await page.goto(URL);
 	const style = (selector: string) => page.locator(selector).first().evaluate((el) => getComputedStyle(el));

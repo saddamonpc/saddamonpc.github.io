@@ -2,6 +2,7 @@
 // The page for one post or project: fading header image, title, meta line, table of contents, text.
 import type { ImageMetadata, MarkdownHeading } from 'astro';
 import { Image } from 'astro:assets';
+import ReadingProgress from '../components/ReadingProgress.astro';
 import TableOfContents from '../components/TableOfContents.astro';
 import TagPills from '../components/TagPills.astro';
 import type { CollectionName } from '../lib/content';
@@ -35,6 +36,7 @@ const factRows = [
 ---
 
 <BaseLayout title={title} description={description} image={cover} current={collection}>
+	<ReadingProgress />
 	<article>
 		{
 			cover && (
