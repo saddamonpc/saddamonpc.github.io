@@ -14,6 +14,24 @@ test('posts grouped by year, with a preview', async ({ page }) => {
 	expect(await preview.evaluate((el) => getComputedStyle(el).webkitLineClamp)).toBe('2');
 });
 
+test('each post shows its reading time under the date (beside it on phones)', async ({ page }) => {
+	await page.goto('/posts/');
+	const date = sample(page).locator('time');
+	const reading = sample(page).getByText(/^[A-Z][a-z]+-minute read$|^\d+-minute read$/);
+	await expect(date).toHaveText('2 Nov');
+	const [d, r] = [(await date.boundingBox())!, (await reading.boundingBox())!];
+	expect(r.y).toBeGreaterThan(d.y); // under it
+	expect(Math.abs(r.x - d.x)).toBeLessThanOrEqual(1);
+	const title = (await sample(page).getByRole('link', { name: /^Sample post/ }).boundingBox())!;
+	expect(r.x + r.width).toBeLessThanOrEqual(title.x); // in the date column, left of the title
+
+	await page.setViewportSize({ width: 375, height: 740 });
+	const [dp, rp] = [(await date.boundingBox())!, (await reading.boundingBox())!];
+	expect(rp.y).toBeLessThan(dp.y + dp.height); // on phones: the same line, beside the date
+	expect(rp.y + rp.height).toBeGreaterThan(dp.y);
+	expect(rp.x).toBeGreaterThan(dp.x + dp.width);
+});
+
 test('picture strip: 6 thumbnails, then +5', async ({ page }) => {
 	await page.goto('/posts/');
 	const thumbs = sample(page).locator('.thumb');

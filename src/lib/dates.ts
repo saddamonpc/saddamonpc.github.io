@@ -5,6 +5,7 @@ const formats = {
 	long: new Intl.DateTimeFormat('en-GB', { timeZone: 'UTC', day: 'numeric', month: 'long', year: 'numeric' }), // 2 November 2026
 	short: new Intl.DateTimeFormat('en-GB', { timeZone: 'UTC', day: 'numeric', month: 'short', year: 'numeric' }), // 2 Nov 2026
 	dayMonth: new Intl.DateTimeFormat('en-GB', { timeZone: 'UTC', day: 'numeric', month: 'short' }), // 2 Nov
+	monthYear: new Intl.DateTimeFormat('en-GB', { timeZone: 'UTC', month: 'short', year: 'numeric' }), // Nov 2026
 	year: new Intl.DateTimeFormat('en-GB', { timeZone: 'UTC', year: 'numeric' }), // 2026
 };
 

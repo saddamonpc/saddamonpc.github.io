@@ -1,8 +1,8 @@
 ---
-// One post on the posts page: date, title, picture strip, two-line preview, tags.
+// One post on the posts page: date and reading time, title, picture strip, two-line preview, tags.
 import type { StripItem } from '../lib/images';
 import { entryUrl } from '../lib/content';
-import { formatDate } from '../lib/dates';
+import { formatDate, readingTime } from '../lib/dates';
 import PictureStrip from './PictureStrip.astro';
 import TagPills from './TagPills.astro';
 
@@ -10,17 +10,22 @@ interface Props {
 	id: string;
 	title: string;
 	date: Date;
+	readingMinutes: number;
 	tags: string[];
 	excerpt: string;
 	media: StripItem[];
 }
 
-const { id, title, date, tags, excerpt, media } = Astro.props;
+const { id, title, date, readingMinutes, tags, excerpt, media } = Astro.props;
 const url = entryUrl('posts', id);
 ---
 
-<article data-tags={JSON.stringify(tags)} class="grid grid-cols-1 gap-x-3.5 border-b border-dotted border-line py-3 sm:grid-cols-[4rem_1fr]">
-	<time datetime={date.toISOString()} class="pt-0.5 text-sm text-muted">{formatDate(date, 'dayMonth')}</time>
+<article data-tags={JSON.stringify(tags)} class="grid grid-cols-1 gap-x-3.5 border-b border-dotted border-line py-3 sm:grid-cols-[7rem_1fr]">
+	<!-- Phones: date and reading time on one line above the title. Wider screens: a column, one under the other. -->
+	<div class="flex flex-wrap items-baseline gap-x-3 pt-0.5 text-muted sm:flex-col">
+		<time datetime={date.toISOString()} class="text-sm">{formatDate(date, 'dayMonth')}</time>
+		<span class="text-xs">{readingTime(readingMinutes)}</span>
+	</div>
 	<div>
 		<a href={url} class="font-semibold no-underline hover:underline">{title}</a>
 		<PictureStrip media={media} postTitle={title} postUrl={url} />

@@ -13,7 +13,7 @@ import { countTags } from '../../lib/tag-filter';
 const posts = await Promise.all(
 	(await getPublished('posts')).map(async (post) => {
 		const { remarkPluginFrontmatter: meta } = await render(post);
-		return { post, excerpt: meta.excerpt as string, media: await stripItems(post, meta.media) };
+		return { post, excerpt: meta.excerpt as string, readingMinutes: meta.readingMinutes as number, media: await stripItems(post, meta.media) };
 	}),
 );
 
@@ -29,8 +29,16 @@ const years = Map.groupBy(posts, ({ post }) => formatDate(post.data.date, 'year'
 			[...years].map(([year, entries]) => (
 				<section data-filter-group>
 					<h2 class="mt-8 mb-1 text-xl font-semibold text-strong">{year}</h2>
-					{entries.map(({ post, excerpt, media }) => (
-						<PostRow id={post.id} title={post.data.title} date={post.data.date} tags={post.data.tags} excerpt={excerpt} media={media} />
+					{entries.map(({ post, excerpt, readingMinutes, media }) => (
+						<PostRow
+							id={post.id}
+							title={post.data.title}
+							date={post.data.date}
+							readingMinutes={readingMinutes}
+							tags={post.data.tags}
+							excerpt={excerpt}
+							media={media}
+						/>
 					))}
 				</section>
 			))

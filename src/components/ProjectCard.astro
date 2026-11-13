@@ -1,21 +1,22 @@
 ---
-// One card on the projects page: cover picture, title, year, tags.
+// One card on the projects page: cover picture, title, month and year, reading time, tags.
 // The picture and title are one link; the tags are separate links after it (links can't be nested).
 import type { ImageMetadata } from 'astro';
 import { Image } from 'astro:assets';
 import { entryUrl } from '../lib/content';
-import { formatDate } from '../lib/dates';
+import { formatDate, readingTime } from '../lib/dates';
 import TagPills from './TagPills.astro';
 
 interface Props {
 	id: string;
 	title: string;
 	date: Date;
+	readingMinutes: number;
 	tags: string[];
 	cover?: ImageMetadata;
 }
 
-const { id, title, date, tags, cover } = Astro.props;
+const { id, title, date, readingMinutes, tags, cover } = Astro.props;
 ---
 
 <article data-tags={JSON.stringify(tags)} class="overflow-hidden rounded-md border border-line hover:border-accent">
@@ -29,7 +30,8 @@ const { id, title, date, tags, cover } = Astro.props;
 		}
 		<div class="px-3 pt-2">
 			<b class="block leading-snug font-semibold text-strong">{title}</b>
-			<span class="text-sm text-muted">{formatDate(date, 'year')}</span>
+			<time datetime={date.toISOString()} class="block text-sm text-muted">{formatDate(date, 'monthYear')}</time>
+			<span class="block text-xs text-muted">{readingTime(readingMinutes)}</span>
 		</div>
 	</a>
 	<div class="px-3 pt-1 pb-3">

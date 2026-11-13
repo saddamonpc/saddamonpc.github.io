@@ -9,8 +9,10 @@ test('formats midnight UTC without shifting the day', () => {
 	expect(formatDate(d, 'dayMonth')).toBe('2 Nov');
 });
 
-test('formats the year', () => {
+test('formats the year, and the month with the year', () => {
 	expect(formatDate(new Date('2026-01-01T00:00:00Z'), 'year')).toBe('2026');
+	expect(formatDate(new Date('2025-10-12T00:00:00Z'), 'monthYear')).toBe('Oct 2025');
+	expect(formatDate(new Date('2025-09-12T00:00:00Z'), 'monthYear')).toBe('Sept 2025'); // British English shortens September to "Sept"
 });
 
 test('reading time is a phrase: words up to ten minutes, digits after', () => {

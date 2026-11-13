@@ -12,6 +12,16 @@ test('projects page shows cards', async ({ page }) => {
 	await expect(page.locator('a a')).toHaveCount(0);
 });
 
+test('a card shows the month and year, with the reading time under it', async ({ page }) => {
+	await page.goto('/projects/');
+	const card = page.locator('[data-tags]', { hasText: 'Sample project' });
+	const date = card.locator('time');
+	await expect(date).toHaveText('Oct 2026');
+	await expect(date).toHaveAttribute('datetime', '2026-10-01T00:00:00.000Z');
+	const reading = card.getByText(/^[A-Z][a-z]+-minute read$|^\d+-minute read$/);
+	expect((await reading.boundingBox())!.y).toBeGreaterThan((await date.boundingBox())!.y);
+});
+
 test('filtering projects by tag', async ({ page }) => {
 	await page.goto('/projects/');
 	await page.getByRole('button', { name: /^zbrush\s*\d+$/ }).click();
